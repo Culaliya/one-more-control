@@ -4,6 +4,8 @@
 
 ONE MORE CONTROL is an English-first browser game about experimental design, falsification, and calibrated uncertainty. A player begins with one synthetic observation and three plausible mechanisms, commits to prior beliefs, and spends a limited budget on experiments. Every test requires a prediction before it runs. The goal is not to collect the most data; it is to choose the control that makes the wrong explanations impossible.
 
+**Playable demo:** [one-more-control.culaliya.chatgpt.site](https://one-more-control.culaliya.chatgpt.site)
+
 The current Task 01 vertical slice contains the complete landing experience and one fully playable case, **Case 01 — The Fading Signal**. **Case 02 — The Weak Mutant is planned, but is not implemented in this build.**
 
 ## Why this project exists

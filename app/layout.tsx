@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://one-more-control.openai.site"),
+  metadataBase: new URL("https://one-more-control.culaliya.chatgpt.site"),
   title: {
     default: "ONE MORE CONTROL",
     template: "%s — ONE MORE CONTROL",

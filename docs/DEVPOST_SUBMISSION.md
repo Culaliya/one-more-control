@@ -24,7 +24,7 @@ Codex, GPT-5.6, OpenAI Responses API, official OpenAI JavaScript SDK, Next.js, T
 
 ### Project URL
 
-`[ADD PUBLIC WORKING DEMO URL]`
+`https://one-more-control.culaliya.chatgpt.site`
 
 ### Repository URL
 
@@ -101,7 +101,7 @@ GPT-5.6 is integrated into the product through a schema-bound image-interpretati
 
 ### Testing instructions for judges
 
-1. Open `[ADD PUBLIC WORKING DEMO URL]`. No sign-in is required.
+1. Open `https://one-more-control.culaliya.chatgpt.site`. No sign-in is required after the site is switched from owner-only review to public access.
 2. Select **ENTER CASE 01** and choose **ANALYZE THE OBSERVATION**. A visible source indicator identifies the live GPT-5.6 response or the authored fallback.
 3. Allocate priors across all three hypotheses and lock them.
 4. For the clearest short path, run **Post-reaction spike-in** and then **Orthogonal product quantification**. Complete the prediction gate and belief update after each result.
