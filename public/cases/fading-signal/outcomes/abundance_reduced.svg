@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="560" viewBox="0 0 960 560" role="img" aria-labelledby="chart-title chart-description">
+<title id="chart-title">SOLUBLE ENZYME · ABUNDANCE REDUCED</title>
+<desc id="chart-description">Soluble enzyme abundance in the V-17 condition is less than half of the vehicle condition.</desc>
+<metadata>Synthetic educational chart. Public artwork does not encode case truth.</metadata>
+<defs>
+<pattern id="cyan-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#19383A"/><line x1="0" y1="0" x2="0" y2="8" stroke="#50D4D8" stroke-width="3"/></pattern>
+</defs>
+<rect width="960" height="560" rx="22" fill="#101416"/>
+<rect x="24" y="24" width="912" height="512" rx="17" fill="#171D20" stroke="#344147"/>
+<text x="58.0" y="62.0" fill="#F2B84B" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="700" text-anchor="start" letter-spacing="2.1">SYNTHETIC RESULT</text>
+<text x="58.0" y="101.0" fill="#F3EEDF" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="760" text-anchor="start">SOLUBLE ENZYME · ABUNDANCE REDUCED</text>
+<text x="58.0" y="126.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="500" text-anchor="start" letter-spacing="1.2">AUTHORED OUTCOME · NOT A WET-LAB PROTOCOL</text>
+<line x1="112" y1="440.0" x2="844" y2="440.0" stroke="#344147" stroke-width="1"/>
+<text x="96.0" y="445.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="end">0</text>
+<line x1="112" y1="380.4" x2="844" y2="380.4" stroke="#344147" stroke-width="1"/>
+<text x="96.0" y="385.4" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="end">25</text>
+<line x1="112" y1="320.8" x2="844" y2="320.8" stroke="#344147" stroke-width="1"/>
+<text x="96.0" y="325.8" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="end">50</text>
+<line x1="112" y1="261.2" x2="844" y2="261.2" stroke="#344147" stroke-width="1"/>
+<text x="96.0" y="266.2" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="end">75</text>
+<line x1="112" y1="201.7" x2="844" y2="201.7" stroke="#344147" stroke-width="1"/>
+<text x="96.0" y="206.7" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="end">100</text>
+<line x1="112" y1="154" x2="112" y2="440" stroke="#A8B1AC"/>
+<line x1="112" y1="440" x2="844" y2="440" stroke="#A8B1AC"/>
+<line x1="295.0" y1="440" x2="295.0" y2="447" stroke="#A8B1AC"/>
+<text x="295.0" y="465.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="middle">VEHICLE</text>
+<line x1="661.0" y1="440" x2="661.0" y2="447" stroke="#A8B1AC"/>
+<text x="661.0" y="465.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="middle">V-17</text>
+<text x="478.0" y="493.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="middle" letter-spacing="0.8">CONDITION</text>
+<text x="47" y="297.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="middle" letter-spacing="0.8" transform="rotate(-90 47 297.0)">SOLUBLE ENZYME (% VEHICLE)</text>
+<rect x="220.0" y="201.7" width="150.0" height="238.3" rx="6" fill="#F2B84B" stroke="#F2B84B" stroke-width="2"/>
+<text x="295.0" y="188.7" fill="#F2B84B" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" font-weight="750" text-anchor="middle">100%</text>
+<rect x="586.0" y="339.9" width="150.0" height="100.1" rx="6" fill="url(#cyan-hatch)" stroke="#50D4D8" stroke-width="2"/>
+<text x="661.0" y="326.9" fill="#50D4D8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" font-weight="750" text-anchor="middle">42%</text>
+<text x="620.0" y="123.0" fill="#F2B84B" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="500" text-anchor="start" letter-spacing="0.6">SOLID · VEHICLE</text>
+<text x="620.0" y="144.0" fill="#50D4D8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="500" text-anchor="start" letter-spacing="0.6">HATCH · V-17</text>
+<text x="902.0" y="512.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="500" text-anchor="end" letter-spacing="1.2">ONE MORE CONTROL</text>
+</svg>

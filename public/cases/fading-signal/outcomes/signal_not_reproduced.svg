@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="560" viewBox="0 0 960 560" role="img" aria-labelledby="chart-title chart-description">
+<title id="chart-title">REPEAT ASSAY · SIGNAL NOT REPRODUCED</title>
+<desc id="chart-description">The repeat V-17 fluorescence trace rises substantially faster than the original low-signal trace.</desc>
+<metadata>Synthetic educational chart. Public artwork does not encode case truth.</metadata>
+<defs>
+<pattern id="cyan-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#19383A"/><line x1="0" y1="0" x2="0" y2="8" stroke="#50D4D8" stroke-width="3"/></pattern>
+</defs>
+<rect width="960" height="560" rx="22" fill="#101416"/>
+<rect x="24" y="24" width="912" height="512" rx="17" fill="#171D20" stroke="#344147"/>
+<text x="58.0" y="62.0" fill="#F2B84B" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="700" text-anchor="start" letter-spacing="2.1">SYNTHETIC RESULT</text>
+<text x="58.0" y="101.0" fill="#F3EEDF" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="760" text-anchor="start">REPEAT ASSAY · SIGNAL NOT REPRODUCED</text>
+<text x="58.0" y="126.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="500" text-anchor="start" letter-spacing="1.2">AUTHORED OUTCOME · NOT A WET-LAB PROTOCOL</text>
+<line x1="112" y1="440.0" x2="844" y2="440.0" stroke="#344147" stroke-width="1"/>
+<text x="96.0" y="445.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="end">0</text>
+<line x1="112" y1="368.5" x2="844" y2="368.5" stroke="#344147" stroke-width="1"/>
+<text x="96.0" y="373.5" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="end">30</text>
+<line x1="112" y1="297.0" x2="844" y2="297.0" stroke="#344147" stroke-width="1"/>
+<text x="96.0" y="302.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="end">60</text>
+<line x1="112" y1="225.5" x2="844" y2="225.5" stroke="#344147" stroke-width="1"/>
+<text x="96.0" y="230.5" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="end">90</text>
+<line x1="112" y1="154.0" x2="844" y2="154.0" stroke="#344147" stroke-width="1"/>
+<text x="96.0" y="159.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="end">120</text>
+<line x1="112" y1="154" x2="112" y2="440" stroke="#A8B1AC"/>
+<line x1="112" y1="440" x2="844" y2="440" stroke="#A8B1AC"/>
+<line x1="112.0" y1="440" x2="112.0" y2="447" stroke="#A8B1AC"/>
+<text x="112.0" y="465.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="middle">0</text>
+<line x1="234.0" y1="440" x2="234.0" y2="447" stroke="#A8B1AC"/>
+<text x="234.0" y="465.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="middle">1</text>
+<line x1="356.0" y1="440" x2="356.0" y2="447" stroke="#A8B1AC"/>
+<text x="356.0" y="465.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="middle">2</text>
+<line x1="478.0" y1="440" x2="478.0" y2="447" stroke="#A8B1AC"/>
+<text x="478.0" y="465.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="middle">3</text>
+<line x1="600.0" y1="440" x2="600.0" y2="447" stroke="#A8B1AC"/>
+<text x="600.0" y="465.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="middle">4</text>
+<line x1="722.0" y1="440" x2="722.0" y2="447" stroke="#A8B1AC"/>
+<text x="722.0" y="465.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="middle">5</text>
+<line x1="844.0" y1="440" x2="844.0" y2="447" stroke="#A8B1AC"/>
+<text x="844.0" y="465.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="middle">6</text>
+<text x="478.0" y="493.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="middle" letter-spacing="0.8">REACTION TIME (MIN)</text>
+<text x="47" y="297.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="middle" letter-spacing="0.8" transform="rotate(-90 47 297.0)">FLUORESCENCE (A.U.)</text>
+<polyline points="112.0,420.9 234.0,406.6 356.0,392.3 478.0,378.0 600.0,363.7 722.0,349.4 844.0,335.1" fill="none" stroke="#50D4D8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="112.0" cy="420.9" r="5" fill="#171D20" stroke="#50D4D8" stroke-width="3"/>
+<circle cx="234.0" cy="406.6" r="5" fill="#171D20" stroke="#50D4D8" stroke-width="3"/>
+<circle cx="356.0" cy="392.3" r="5" fill="#171D20" stroke="#50D4D8" stroke-width="3"/>
+<circle cx="478.0" cy="378.0" r="5" fill="#171D20" stroke="#50D4D8" stroke-width="3"/>
+<circle cx="600.0" cy="363.7" r="5" fill="#171D20" stroke="#50D4D8" stroke-width="3"/>
+<circle cx="722.0" cy="349.4" r="5" fill="#171D20" stroke="#50D4D8" stroke-width="3"/>
+<circle cx="844.0" cy="335.1" r="5" fill="#171D20" stroke="#50D4D8" stroke-width="3"/>
+<line x1="574" y1="119" x2="608" y2="119" stroke="#50D4D8" stroke-width="3"/>
+<circle cx="591" cy="119" r="4" fill="#171D20" stroke="#50D4D8" stroke-width="2"/>
+<text x="619.0" y="124.0" fill="#F3EEDF" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="start">ORIGINAL V-17</text>
+<polyline points="112.0,420.9 234.0,385.2 356.0,347.1 478.0,308.9 600.0,270.8 722.0,232.7 844.0,194.5" fill="none" stroke="#FF6262" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="8 7"/>
+<rect x="107.0" y="415.9" width="10" height="10" fill="#171D20" stroke="#FF6262" stroke-width="3"/>
+<rect x="229.0" y="380.2" width="10" height="10" fill="#171D20" stroke="#FF6262" stroke-width="3"/>
+<rect x="351.0" y="342.1" width="10" height="10" fill="#171D20" stroke="#FF6262" stroke-width="3"/>
+<rect x="473.0" y="303.9" width="10" height="10" fill="#171D20" stroke="#FF6262" stroke-width="3"/>
+<rect x="595.0" y="265.8" width="10" height="10" fill="#171D20" stroke="#FF6262" stroke-width="3"/>
+<rect x="717.0" y="227.7" width="10" height="10" fill="#171D20" stroke="#FF6262" stroke-width="3"/>
+<rect x="839.0" y="189.5" width="10" height="10" fill="#171D20" stroke="#FF6262" stroke-width="3"/>
+<line x1="574" y1="143" x2="608" y2="143" stroke="#FF6262" stroke-width="3" stroke-dasharray="8 7"/>
+<rect x="587" y="139" width="8" height="8" fill="#171D20" stroke="#FF6262" stroke-width="2"/>
+<text x="619.0" y="148.0" fill="#F3EEDF" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="start">REPEAT V-17</text>
+<text x="902.0" y="512.0" fill="#A8B1AC" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="500" text-anchor="end" letter-spacing="1.2">ONE MORE CONTROL</text>
+</svg>
