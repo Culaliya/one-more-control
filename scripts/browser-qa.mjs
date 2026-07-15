@@ -199,7 +199,8 @@ async function screenshot(filename, width, height) {
     screenHeight: height,
   });
   await evaluate("window.scrollTo(0, 0); true");
-  await delay(150);
+  // Allow finite reveal transitions to settle before visual evidence is captured.
+  await delay(1_700);
   const result = await command("Page.captureScreenshot", {
     format: "png",
     fromSurface: true,
@@ -237,6 +238,7 @@ async function run() {
 
   chrome = spawn(chromePath, [
     "--headless=new",
+    "--no-sandbox",
     "--disable-gpu",
     "--disable-background-networking",
     "--disable-component-update",
@@ -265,12 +267,19 @@ async function run() {
   await clickButton("LOCK MY PRIORS");
   await waitForText("EXPERIMENT DECK");
   await screenshot("case-lab-desktop.png", 1440, 1000);
+  await screenshot("case-lab-ipad.png", 1024, 1366);
+  await screenshot("case-lab-iphone.png", 393, 852);
 
   await runExperiment("Post-reaction spike-in", "Signal falls immediately");
   await screenshot("case-result-desktop.png", 1440, 1000);
+  await screenshot("case-result-ipad.png", 1024, 1366);
+  await screenshot("case-result-iphone.png", 393, 852);
   await updateBeliefs(80);
 
+  // Exercise the second experiment and verdict flow at tablet width.
+  await screenshot("case-lab-after-one-ipad.png", 1024, 1366);
   await runExperiment("Orthogonal product quantification", "Normal product amount");
+  await screenshot("case-result-orthogonal-ipad.png", 1024, 1366);
   await updateBeliefs(90);
 
   await clickButton("SUBMIT A MECHANISM");

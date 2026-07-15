@@ -79,6 +79,16 @@ export function LandingPage() {
         </div>
 
         <div className="specimen-stage" aria-label="Interactive case preview">
+          {/* Decorative chapter art only. It never represents authored evidence. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="specimen-key-art"
+            src="/cases/fading-signal/art/case-cover-art.webp"
+            alt=""
+            width={1672}
+            height={941}
+            aria-hidden="true"
+          />
           <div className="stage-grid" aria-hidden="true" />
           <div className="specimen-coordinate coordinate-top">Y / SIGNAL</div>
           <div className="specimen-coordinate coordinate-side">X / TIME</div>
@@ -124,11 +134,15 @@ export function LandingPage() {
               <span>EXPERIMENTAL BUDGET</span>
               <strong>100 <small>UNITS LEFT</small></strong>
             </div>
-            <button type="button" className="preview-experiment-card">
+            <Link
+              href="/cases/fading-signal"
+              className="preview-experiment-card"
+              aria-label="Enter Case 01 from the timing-control preview"
+            >
               <span className="micro-label">TIMING CONTROL · COST 15</span>
               <strong>Add compound after the reaction</strong>
               <span className="preview-run">PREVIEW SPLIT <b>↗</b></span>
-            </button>
+            </Link>
             <div className="prediction-lines" aria-hidden="true">
               <i className="prediction-line line-one" />
               <i className="prediction-line line-two" />

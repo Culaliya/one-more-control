@@ -4,6 +4,7 @@ import type {
   ExperimentRun,
   HypothesisDefinition,
 } from "@/types/game";
+import { ExperimentGlyph } from "./ExperimentGlyph";
 
 export function ResultPanel({
   run,
@@ -27,11 +28,22 @@ export function ResultPanel({
   const lowInformation = run.informationGainBits < 0.1;
 
   return (
-    <section className="result-panel" aria-labelledby="result-title">
+    <section
+      className={`result-panel ${lowInformation ? "result-low" : "result-decisive"}`}
+      aria-labelledby="result-title"
+    >
       <header className="result-title-row">
-        <div>
-          <p className="stage-label">AUTHORED RESULT · {experiment.category.toUpperCase()}</p>
-          <h1 id="result-title">{outcome.title}</h1>
+        <div className="result-heading-lockup">
+          <ExperimentGlyph
+            className="result-experiment-glyph"
+            experimentId={experiment.id}
+            size={62}
+            decorative
+          />
+          <div>
+            <p className="stage-label">AUTHORED RESULT · {experiment.category.toUpperCase()}</p>
+            <h1 id="result-title">{outcome.title}</h1>
+          </div>
         </div>
         <span className="result-index">RESULT {run.runId.split("-").at(-1)}</span>
       </header>

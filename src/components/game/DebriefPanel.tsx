@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { DebriefResponse } from "@/types/api";
 import type { ExperimentRun, PublicCaseDefinition } from "@/types/game";
+import { ReasoningFingerprintGraphic } from "./ReasoningFingerprintGraphic";
 
 function percent(value: number): string {
   return `${Math.round(value * 100)}%`;
@@ -50,11 +51,12 @@ export function DebriefPanel({
   return (
     <section className="debrief-panel" aria-labelledby="debrief-title">
       <div className="debrief-hero">
-        <div className="debrief-score" aria-label={`Final score ${debrief.score.total} out of 100`}>
-          <span>FINAL SCORE</span>
-          <strong>{debrief.score.total}</strong>
-          <small>/100</small>
-          <i style={{ "--score": `${debrief.score.total * 3.6}deg` } as React.CSSProperties} aria-hidden="true" />
+        <div className="debrief-fingerprint-hero">
+          <span>FINAL REASONING SIGNATURE</span>
+          <ReasoningFingerprintGraphic
+            fingerprint={debrief.fingerprint}
+            score={debrief.score.total}
+          />
         </div>
         <div className="debrief-reveal">
           <p className="stage-label">CASE RESOLVED · HIDDEN MECHANISM REVEALED</p>
@@ -72,6 +74,21 @@ export function DebriefPanel({
           <p>{debrief.reveal.explanation}</p>
         </div>
       </div>
+
+      <figure className="debrief-resolution-field">
+        {/* This neutral resolution artwork depicts no authored outcome or true mechanism. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/cases/fading-signal/art/resolution-field.webp"
+          alt="Three abstract scientific pathways separated by one precise control line."
+          width={1672}
+          height={941}
+        />
+        <figcaption>
+          <span>SYNTHETIC RESOLUTION ART · NOT EVIDENCE</span>
+          <span>THREE PATHWAYS · ONE SEPARATING CONTROL</span>
+        </figcaption>
+      </figure>
 
       <div className="debrief-grid">
         <article className="score-breakdown-card">

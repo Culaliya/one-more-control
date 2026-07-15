@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { ExperimentGlyph } from "./ExperimentGlyph";
 import type {
   ExperimentDefinition,
   HypothesisDefinition,
@@ -74,7 +75,9 @@ export function PredictionGate({
       </header>
 
       <article className="prediction-experiment-summary">
-        <span className="experiment-number">{experiment.category.slice(0, 2).toUpperCase()}</span>
+        <span className="experiment-number">
+          <ExperimentGlyph experimentId={experiment.id} size={46} decorative />
+        </span>
         <div>
           <span className="micro-label">SELECTED EXPERIMENT</span>
           <strong>{experiment.title}</strong>

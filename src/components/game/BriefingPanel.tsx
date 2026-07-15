@@ -26,6 +26,21 @@ export function BriefingPanel({
         <div className="case-index-mark" aria-hidden="true">01</div>
       </header>
 
+      <figure className="case-cover-band">
+        {/* Decorative chapter art, intentionally separate from the authored observation below. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/cases/fading-signal/art/case-cover-art.webp"
+          alt="Synthetic chapter artwork of a fluorescence assay beneath an optical instrument."
+          width={1672}
+          height={941}
+        />
+        <figcaption>
+          <span>SYNTHETIC CASE ART · NOT EVIDENCE</span>
+          <span>CASE 01 / SIGNAL WITHOUT MECHANISM</span>
+        </figcaption>
+      </figure>
+
       <div className="briefing-grid">
         <div className="briefing-observation">
           <figure>

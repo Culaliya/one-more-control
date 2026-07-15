@@ -1,3 +1,4 @@
+import { ExperimentGlyph } from "./ExperimentGlyph";
 import { HypothesisStack } from "./HypothesisStack";
 import type {
   ExperimentDefinition,
@@ -90,7 +91,14 @@ export function LabBoard({
               return (
                 <article key={experiment.id} className={disabled ? "is-disabled" : ""}>
                   <div className="experiment-card-heading">
-                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <div className="experiment-card-mark">
+                      <ExperimentGlyph
+                        experimentId={experiment.id}
+                        size={48}
+                        decorative
+                      />
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                    </div>
                     <div><small>{experiment.category.toUpperCase()}</small><h2>{experiment.title}</h2></div>
                     <b>−{experiment.cost}</b>
                   </div>
