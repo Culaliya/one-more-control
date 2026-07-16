@@ -34,7 +34,7 @@ If the repository remains private, share it with both `testing@devpost.com` and 
 
 ### Public YouTube demo
 
-`[ADD PUBLIC YOUTUBE URL — VIDEO MUST BE UNDER 3:00]`
+`https://youtu.be/XKuX8YIMGdo`
 
 ### Primary Codex `/feedback` Session ID
 
@@ -131,16 +131,16 @@ Target runtime: **2:50–2:55**. The Official Rules say the video should be less
 
 ### Video compliance checklist
 
-- [ ] Final duration is below `03:00`; target `02:50–02:55`.
-- [ ] Uploaded to YouTube as **Public**, not Private or Unlisted.
-- [ ] Audio clearly explains what was built, how Codex was used, and how GPT-5.6 is integrated.
-- [ ] The working product is visibly demonstrated, not represented only by slides.
-- [ ] The live GPT-5.6 source indicator and the deterministic authored result are both visible.
-- [ ] Narration and on-screen submission material are English, or complete English translations are supplied.
-- [ ] No credentials, API keys, private account information, or unrelated notifications are visible.
-- [ ] Music, fonts, images, icons, trademarks, and other third-party material are owned, licensed, or omitted.
-- [ ] Captions have been reviewed for “Bayesian,” “falsification,” “orthogonal,” “V-17,” “GPT-5.6,” and “Codex.”
-- [ ] The YouTube URL works in a logged-out browser window.
+- [x] Final duration is below `03:00`: the uploaded player reports `02:56` for the 175.000-second master.
+- [x] Uploaded to YouTube as **Public**, not Private or Unlisted.
+- [x] Audio clearly explains what was built, how Codex was used, and how GPT-5.6 is integrated.
+- [x] The working product is visibly demonstrated, not represented only by slides.
+- [x] The live GPT-5.6 source indicator and the deterministic authored result are both visible.
+- [x] Narration and on-screen submission material are English.
+- [x] No credentials, API keys, private account information, or unrelated notifications are visible.
+- [x] Music is omitted; bundled fonts and visual assets are covered by the repository provenance records.
+- [x] Reviewed English (United States) captions are published with the video.
+- [x] The YouTube URL returned public metadata from an unauthenticated request on 2026-07-16.
 
 ## Screenshot checklist
 
