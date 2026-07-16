@@ -30,9 +30,9 @@
 
 ## Public submission
 
-- [ ] Confirm the production URL opens in a logged-out desktop browser.
-- [ ] Confirm the production URL opens in a logged-out phone viewport.
+- [x] Confirm the production URL opens in a logged-out desktop browser.
+- [x] Confirm the production URL opens in a logged-out phone viewport.
 - [x] Confirm the public YouTube demo is English, under three minutes (`02:56` in YouTube), and viewable without a YouTube login: `https://youtu.be/XKuX8YIMGdo`.
 - [ ] Confirm judges can access the repository.
 - [ ] Enter the main Codex `/feedback` Session ID in the submission form.
-- [ ] Generate the ZIP checksum sidecar with the ZIP basename only.
+- [x] Generate the ZIP checksum sidecar with the ZIP basename only.
