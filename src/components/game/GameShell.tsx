@@ -12,7 +12,10 @@ import {
   GameRuleError,
   type GameAction,
 } from "@/lib/game/reducer";
-import { validatePlayerBeliefs } from "@/lib/game/validation";
+import {
+  validatePlayerBeliefs,
+  validatePlayerPrediction,
+} from "@/lib/game/validation";
 import type {
   DebriefResponse,
   ExperimentRunResponse,
@@ -38,7 +41,8 @@ import { PredictionGate } from "./PredictionGate";
 import { ResultPanel } from "./ResultPanel";
 import { VerdictForm } from "./VerdictForm";
 
-const STORAGE_KEY = "one-more-control:fading-signal:v1";
+const STORAGE_KEY = "one-more-control:fading-signal:v2";
+const LEGACY_STORAGE_KEY = "one-more-control:fading-signal:v1";
 const validPhases = new Set<GamePhase>([
   "briefing",
   "priors",
@@ -106,6 +110,35 @@ function isExperimentRunResponse(
   );
 }
 
+function isPlayerPrediction(
+  value: unknown,
+  hypothesisIds: readonly string[],
+): value is PlayerPrediction {
+  if (!isRecord(value) || typeof value.mode !== "string") return false;
+  const candidate = value as unknown as PlayerPrediction;
+  if (value.mode === "split") {
+    if (
+      !Array.isArray(value.splitGroups) ||
+      value.splitGroups.length !== 2 ||
+      !value.splitGroups.every(
+        (group) => Array.isArray(group) && group.every((id) => typeof id === "string"),
+      )
+    ) {
+      return false;
+    }
+  } else if (value.mode === "no_separation") {
+    if (
+      !Array.isArray(value.hypothesisIds) ||
+      !value.hypothesisIds.every((id) => typeof id === "string")
+    ) {
+      return false;
+    }
+  } else {
+    return false;
+  }
+  return validatePlayerPrediction(candidate, hypothesisIds).length === 0;
+}
+
 function isDebriefResponse(
   value: unknown,
   hypothesisIds: readonly string[],
@@ -114,7 +147,8 @@ function isDebriefResponse(
     !isRecord(value) ||
     !isRecord(value.reveal) ||
     !isRecord(value.score) ||
-    !isRecord(value.fingerprint)
+    !isRecord(value.fingerprint) ||
+    !isRecord(value.reasoningReview)
   ) {
     return false;
   }
@@ -124,8 +158,8 @@ function isDebriefResponse(
     typeof value.trueHypothesisTitle === "string" &&
     typeof value.reveal.title === "string" &&
     typeof value.reveal.explanation === "string" &&
-    Array.isArray(value.reveal.optimalPath) &&
-    value.reveal.optimalPath.every((id) => typeof id === "string") &&
+    Array.isArray(value.reveal.featuredDecisivePath) &&
+    value.reveal.featuredDecisivePath.every((id) => typeof id === "string") &&
     typeof value.reveal.takeaway === "string" &&
     isProbabilityDistribution(value.enginePosterior, hypothesisIds) &&
     typeof value.engineConfidence === "number" &&
@@ -139,7 +173,21 @@ function isDebriefResponse(
     typeof value.fingerprint.falsificationIndex === "number" &&
     typeof value.fingerprint.redundancyRate === "number" &&
     typeof value.fingerprint.evidenceEfficiency === "number" &&
-    typeof value.fingerprint.calibrationGapPercentagePoints === "number"
+    typeof value.fingerprint.calibrationGapPercentagePoints === "number" &&
+    typeof value.fingerprint.predictionAccuracy === "number" &&
+    (value.fingerprint.noSeparationRecognition === null ||
+      typeof value.fingerprint.noSeparationRecognition === "number") &&
+    typeof value.fingerprint.beliefResponsiveness === "number" &&
+    typeof value.reasoningReview.claimSupported === "boolean" &&
+    typeof value.reasoningReview.strongestReasoningMove === "string" &&
+    (value.reasoningReview.unsupportedLeap === null ||
+      typeof value.reasoningReview.unsupportedLeap === "string") &&
+    (value.reasoningReview.evidencePlayerUnderused === null ||
+      typeof value.reasoningReview.evidencePlayerUnderused === "string") &&
+    typeof value.reasoningReview.oneMoreControl === "string" &&
+    typeof value.reasoningReview.summary === "string" &&
+    (value.reasoningReview.source === "gpt-5.6" ||
+      value.reasoningReview.source === "fallback")
   );
 }
 
@@ -150,7 +198,7 @@ function restoreSession(
   if (!isRecord(value)) return null;
   const hypothesisIds = caseDefinition.hypotheses.map((hypothesis) => hypothesis.id);
   if (
-    value.schemaVersion !== 1 ||
+    value.schemaVersion !== 2 ||
     value.caseId !== caseDefinition.id ||
     value.caseVersion !== caseDefinition.version ||
     typeof value.id !== "string" ||
@@ -181,7 +229,25 @@ function restoreSession(
       !experiment.possibleOutcomes.some((outcome) => outcome.id === rawRun.outcomeId) ||
       rawRun.cost !== experiment.cost ||
       typeof rawRun.runId !== "string" ||
-      typeof rawRun.informationGainBits !== "number"
+      typeof rawRun.informationGainBits !== "number" ||
+      !Number.isFinite(rawRun.informationGainBits) ||
+      typeof rawRun.predictionUseful !== "boolean" ||
+      !isPlayerPrediction(rawRun.prediction, hypothesisIds) ||
+      !isRecord(rawRun.playerBeliefsBefore) ||
+      validatePlayerBeliefs(
+        rawRun.playerBeliefsBefore as PlayerBeliefs,
+        hypothesisIds,
+      ).length > 0 ||
+      (rawRun.playerBeliefsAfter !== undefined &&
+        (!isRecord(rawRun.playerBeliefsAfter) ||
+          validatePlayerBeliefs(
+            rawRun.playerBeliefsAfter as PlayerBeliefs,
+            hypothesisIds,
+          ).length > 0)) ||
+      !isProbabilityDistribution(rawRun.enginePrior, hypothesisIds) ||
+      !isProbabilityDistribution(rawRun.enginePosterior, hypothesisIds) ||
+      typeof rawRun.createdAt !== "string" ||
+      !Number.isFinite(Date.parse(rawRun.createdAt))
     ) {
       return null;
     }
@@ -255,6 +321,7 @@ export function GameShell({
     queueMicrotask(() => {
       if (cancelled) return;
       const saved = window.localStorage.getItem(STORAGE_KEY);
+      window.localStorage.removeItem(LEGACY_STORAGE_KEY);
       const restored = saved ? restoreSavedEnvelope(saved, caseDefinition) : null;
       if (restored) {
         setSession(restored.session);
@@ -316,7 +383,7 @@ export function GameShell({
       const response = await fetch("/api/ai/observe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ caseId: caseDefinition.id }),
+        body: JSON.stringify({ caseId: caseDefinition.id, sessionId: session.id }),
       });
       const payload: unknown = await response.json();
       if (!response.ok) {
@@ -413,12 +480,25 @@ export function GameShell({
     setIsBusy(true);
     setApiError("");
     try {
+      const runHistory = session.runs.map((run) => {
+        if (!run.playerBeliefsAfter) {
+          throw new Error("Finish the belief update for every result before submitting.");
+        }
+        return {
+          experimentId: run.experimentId,
+          prediction: run.prediction,
+          playerBeliefsBefore: run.playerBeliefsBefore,
+          playerBeliefsAfter: run.playerBeliefsAfter,
+          createdAt: run.createdAt,
+        };
+      });
       const response = await fetch("/api/verdict/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           caseId: caseDefinition.id,
-          runHistory: session.runs.map((run) => run.experimentId),
+          sessionId: session.id,
+          runHistory,
           verdict,
         }),
       });

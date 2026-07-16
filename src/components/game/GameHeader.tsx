@@ -35,10 +35,6 @@ export function GameHeader({
           <span>BUDGET</span>
           <strong>{budget.toString().padStart(3, "0")}</strong>
         </div>
-        {/* TODO(Task 03): enable the accessible hypothesis soundscape. */}
-        <button className="header-utility" type="button" disabled>
-          SOUND OFF
-        </button>
         <button className="header-utility reset-button" type="button" onClick={onReset}>
           RESET
         </button>

@@ -1,6 +1,7 @@
 {
   "name": "one-more-control",
   "version": "0.1.0",
+  "packageManager": "npm@10.9.2",
   "private": true,
   "engines": {
     "node": ">=22.13.0"
@@ -14,8 +15,11 @@
     "typecheck": "tsc --noEmit",
     "assets:generate": "python3 scripts/generate-case-assets.py && python3 scripts/generate-social-card.py",
     "qa:browser": "node scripts/browser-qa.mjs",
+    "record:competition": "node scripts/competition-record.mjs",
+    "smoke:api:live": "node scripts/live-api-smoke.mjs",
+    "check:client-boundary": "node scripts/check-client-boundary.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "check": "npm run lint && npm run typecheck && npm run test && npm run build"
+    "check": "npm run lint && npm run typecheck && npm run test && npm run build && npm run check:client-boundary"
   },
   "dependencies": {
     "next": "16.2.10",

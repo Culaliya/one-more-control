@@ -74,7 +74,7 @@ export function createInitialGameSession(
 ): GameSession {
   const hypothesisIds = caseDefinition.hypotheses.map(({ id }) => id);
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     id: sessionId,
     caseId: caseDefinition.id,
     caseVersion: caseDefinition.version,
@@ -227,4 +227,3 @@ export function gameReducer(
       return createInitialGameSession(action.caseDefinition, action.sessionId);
   }
 }
-

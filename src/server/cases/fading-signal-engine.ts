@@ -16,8 +16,13 @@ import type {
   ExperimentRun,
   PlayerBeliefs,
   PlayerPrediction,
+  PlayerRunTrailEntry,
   ProbabilityDistribution,
 } from "@/types/game";
+import {
+  validatePlayerBeliefs,
+  validatePlayerPrediction,
+} from "@/lib/game/validation";
 import { fadingSignalTruth } from "./private/fading-signal-truth";
 
 export class CaseEngineError extends Error {
@@ -37,10 +42,8 @@ function neutralPlayerBeliefs(): PlayerBeliefs {
 
 function neutralPrediction(): PlayerPrediction {
   return {
-    splitGroups: [
-      [FADING_SIGNAL_HYPOTHESIS_IDS[0]],
-      FADING_SIGNAL_HYPOTHESIS_IDS.slice(1),
-    ],
+    mode: "no_separation",
+    hypothesisIds: [...FADING_SIGNAL_HYPOTHESIS_IDS],
   };
 }
 
@@ -99,7 +102,10 @@ export function replayFadingSignalHistory(
       cost: experiment.cost,
       outcomeId,
       prediction: neutralPrediction(),
-      predictionUseful: false,
+      predictionUseful: predictionMatchesExperiment(
+        experimentId,
+        neutralPrediction(),
+      ),
       enginePrior,
       enginePosterior: posterior,
       informationGainBits,
@@ -126,6 +132,18 @@ export function predictionMatchesExperiment(
   experimentId: FadingSignalExperimentId,
   prediction: PlayerPrediction,
 ): boolean {
+  if (prediction.mode === "no_separation") {
+    const outcomes = new Set(
+      prediction.hypothesisIds.map((hypothesisId) =>
+        predictedOutcomeForHypothesis(
+          experimentId,
+          hypothesisId as FadingSignalHypothesisId,
+        ),
+      ),
+    );
+    return outcomes.size === 1 && !outcomes.has(undefined);
+  }
+
   const groupOutcomes = prediction.splitGroups.map((group) =>
     new Set(
       group.map((hypothesisId) => {
@@ -147,4 +165,92 @@ export function predictionMatchesExperiment(
     return false;
   }
   return [...groupOutcomes[0]][0] !== [...groupOutcomes[1]][0];
+}
+
+function beliefsMatch(left: PlayerBeliefs, right: PlayerBeliefs): boolean {
+  return FADING_SIGNAL_HYPOTHESIS_IDS.every(
+    (hypothesisId) => left[hypothesisId] === right[hypothesisId],
+  );
+}
+
+export function replayFadingSignalTrail(
+  trail: readonly PlayerRunTrailEntry[],
+): {
+  runs: ExperimentRun[];
+  posterior: ProbabilityDistribution;
+  budgetSpent: number;
+} {
+  validateExperimentHistory(
+    trail.map((entry) => entry.experimentId as FadingSignalExperimentId),
+  );
+  let posterior = createUniformDistribution(FADING_SIGNAL_HYPOTHESIS_IDS);
+  let budgetSpent = 0;
+  let previousBeliefsAfter: PlayerBeliefs | undefined;
+  let previousTimestamp = 0;
+
+  const runs = trail.map((entry, index) => {
+    const experimentId = entry.experimentId as FadingSignalExperimentId;
+    const experiment = getFadingSignalExperiment(experimentId);
+    const outcomeId = fadingSignalTruth.actualOutcomeByExperiment[experimentId];
+    if (!experiment || !outcomeId) {
+      throw new CaseEngineError(`Case truth is incomplete for ${experimentId}.`);
+    }
+    const predictionIssues = validatePlayerPrediction(
+      entry.prediction,
+      FADING_SIGNAL_HYPOTHESIS_IDS,
+    );
+    const beliefIssues = [
+      ...validatePlayerBeliefs(
+        entry.playerBeliefsBefore,
+        FADING_SIGNAL_HYPOTHESIS_IDS,
+      ),
+      ...validatePlayerBeliefs(
+        entry.playerBeliefsAfter,
+        FADING_SIGNAL_HYPOTHESIS_IDS,
+      ),
+    ];
+    if (predictionIssues.length > 0 || beliefIssues.length > 0) {
+      throw new CaseEngineError("Player reasoning trail is invalid.");
+    }
+    if (
+      previousBeliefsAfter &&
+      !beliefsMatch(previousBeliefsAfter, entry.playerBeliefsBefore)
+    ) {
+      throw new CaseEngineError("Player belief history is not continuous.");
+    }
+    const timestamp = Date.parse(entry.createdAt);
+    if (!Number.isFinite(timestamp) || timestamp < previousTimestamp) {
+      throw new CaseEngineError("Player run timestamps are invalid.");
+    }
+
+    const enginePrior = posterior;
+    posterior = updatePosteriorForOutcome(enginePrior, experiment, outcomeId);
+    const informationGainBits = realizedInformationGainBits(
+      posterior,
+      enginePrior,
+    );
+    budgetSpent += experiment.cost;
+    previousBeliefsAfter = entry.playerBeliefsAfter;
+    previousTimestamp = timestamp;
+
+    return {
+      runId: `run-${index + 1}`,
+      experimentId,
+      cost: experiment.cost,
+      outcomeId,
+      prediction: entry.prediction,
+      predictionUseful: predictionMatchesExperiment(
+        experimentId,
+        entry.prediction,
+      ),
+      enginePrior,
+      enginePosterior: posterior,
+      informationGainBits,
+      playerBeliefsBefore: entry.playerBeliefsBefore,
+      playerBeliefsAfter: entry.playerBeliefsAfter,
+      createdAt: entry.createdAt,
+    } satisfies ExperimentRun;
+  });
+
+  return { runs, posterior, budgetSpent };
 }

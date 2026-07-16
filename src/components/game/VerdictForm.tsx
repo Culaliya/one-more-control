@@ -24,7 +24,7 @@ export function VerdictForm({
   onSubmit: (submission: VerdictSubmission) => Promise<void>;
 }) {
   const [hypothesisId, setHypothesisId] = useState("");
-  const [confidence, setConfidence] = useState(70);
+  const [confidence, setConfidence] = useState(67);
   const [evidenceIndexes, setEvidenceIndexes] = useState<number[]>([]);
   const [falsifiedHypothesisId, setFalsifiedHypothesisId] = useState("");
   const [falsifyingEvidenceRunIndex, setFalsifyingEvidenceRunIndex] = useState(-1);
@@ -135,12 +135,12 @@ export function VerdictForm({
           <span><b>CONFIDENCE</b><small>How certain are you?</small></span>
           <input
             type="range"
-            min="50"
+            min="34"
             max="100"
             step="1"
             value={confidence}
             onChange={(event) => setConfidence(Number(event.target.value))}
-            style={{ "--belief-value": `${(confidence - 50) * 2}%` } as React.CSSProperties}
+            style={{ "--belief-value": `${((confidence - 34) / 66) * 100}%` } as React.CSSProperties}
           />
           <output>{confidence}%</output>
         </label>

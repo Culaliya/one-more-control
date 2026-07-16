@@ -21,6 +21,7 @@ export type ObservationInterpretation = z.infer<
 export const observationRequestSchema = z
   .object({
     caseId: z.literal("fading-signal"),
+    sessionId: z.string().trim().min(8).max(128),
   })
   .strict();
 
@@ -29,6 +30,67 @@ export const observationResponseSchema = observationInterpretationSchema.extend(
 });
 
 export type ObservationResponse = z.infer<typeof observationResponseSchema>;
+
+const authoredExperimentTitleSchema = z.enum([
+  "Repeat the fluorescent assay",
+  "Same-channel dose response",
+  "Measure soluble enzyme abundance",
+  "Post-reaction spike-in",
+  "Orthogonal product quantification",
+  "Substrate titration, same readout",
+]);
+
+export const finalReasoningReviewSchema = z
+  .object({
+    claimSupported: z.boolean(),
+    strongestReasoningMove: conciseString,
+    unsupportedLeap: conciseString.nullable(),
+    evidencePlayerUnderused: conciseString.nullable(),
+    oneMoreControl: authoredExperimentTitleSchema,
+    summary: conciseString,
+  })
+  .strict();
+
+export const finalReasoningReviewJsonSchema = {
+  type: "object",
+  properties: {
+    claimSupported: { type: "boolean" },
+    strongestReasoningMove: { type: "string", minLength: 1, maxLength: 180 },
+    unsupportedLeap: {
+      anyOf: [
+        { type: "string", minLength: 1, maxLength: 180 },
+        { type: "null" },
+      ],
+    },
+    evidencePlayerUnderused: {
+      anyOf: [
+        { type: "string", minLength: 1, maxLength: 180 },
+        { type: "null" },
+      ],
+    },
+    oneMoreControl: {
+      type: "string",
+      enum: [
+        "Repeat the fluorescent assay",
+        "Same-channel dose response",
+        "Measure soluble enzyme abundance",
+        "Post-reaction spike-in",
+        "Orthogonal product quantification",
+        "Substrate titration, same readout",
+      ],
+    },
+    summary: { type: "string", minLength: 1, maxLength: 180 },
+  },
+  required: [
+    "claimSupported",
+    "strongestReasoningMove",
+    "unsupportedLeap",
+    "evidencePlayerUnderused",
+    "oneMoreControl",
+    "summary",
+  ],
+  additionalProperties: false,
+} as const;
 
 export const observationJsonSchema = {
   type: "object",

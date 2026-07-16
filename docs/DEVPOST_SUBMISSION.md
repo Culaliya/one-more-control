@@ -56,7 +56,7 @@ ONE MORE CONTROL is a browser-based scientific reasoning game. The current submi
 
 Players assign their initial beliefs, spend a limited experimental budget, and predict which hypotheses each test should separate before running it. Experimental outcomes come from a deterministic authored engine, never from a language model. A Bayesian evidence model tracks how much each result changes the hidden posterior while players update their own beliefs separately.
 
-At the end, the player submits a mechanism, cites two results, falsifies an alternative, and receives a reasoning fingerprint showing falsification index, redundancy rate, evidence efficiency, and calibration gap. The optimal route combines a temporal control with an orthogonal measurement, teaching why two decisive experiments can be worth more than a pile of repeated observations.
+At the end, the player submits a mechanism, cites two results, falsifies an alternative, and receives a reasoning fingerprint showing falsification index, redundancy rate, evidence efficiency, and calibration gap. The featured route combines a temporal control with an orthogonal measurement because that pairing communicates the central lesson most clearly. An alternate 38-unit abundance-plus-titration chain is also scientifically decisive and can earn 100.
 
 ### How we built it
 
@@ -156,12 +156,23 @@ npm run qa:browser
 
 This writes desktop briefing, lab, result, and debrief screenshots plus phone- and tablet-width briefing and debrief screenshots to `artifacts/screenshots/`. The live GPT observation, prediction gate, and second-result gallery shots below are separate manual captures because the automated path prioritizes repeatable end-to-end proof.
 
+For a one-command 16:9 competition rehearsal of the exact ideal route, run:
+
+```bash
+npm run record:competition
+```
+
+This produces the seven numbered frames, sanitized browser result, and 2:53
+shot list beneath `artifacts/competition-record/`. It is zero-cost by default.
+Use `RECORD_WITH_LIVE_OPENAI=1` only when a server-side key is already available
+and two live Responses API calls are intentionally authorized.
+
 - [ ] `01-landing-hero.png` — product name, tagline, primary call to action, and interactive specimen visible without scrolling.
 - [ ] `02-gpt-observation.png` — synthetic chart, schema-bound observation card, missing-controls section, and a genuine `GPT-5.6` source indicator.
 - [ ] `03-prediction-gate.png` — all three hypothesis identities, two prediction groups, experiment cost, and remaining budget.
 - [ ] `04-decisive-timing-result.png` — post-reaction spike-in result, authored result chart, cost, and information gain.
 - [ ] `05-orthogonal-result.png` — non-fluorescent product result and belief-update prompt.
-- [ ] `06-reasoning-fingerprint.png` — completed debrief with score, optimal route, fingerprint, and calibration metrics.
+- [ ] `06-reasoning-fingerprint.png` — completed debrief with score, featured decisive route, fingerprint, and calibration metrics.
 - [ ] `07-responsive-case.png` — phone-width lab view with readable hypothesis status, non-color indicators, and no clipping.
 
 For every selected Devpost image:
@@ -177,7 +188,7 @@ For every selected Devpost image:
 
 - [ ] Public repository contains the MIT `LICENSE`, or private access is granted to both judging addresses.
 - [ ] README includes setup, environment variables, test commands, demo route, AI/truth separation, Codex contribution, and scientific disclaimer.
-- [ ] `.env.example` contains empty `OPENAI_API_KEY` and `OPENAI_MODEL=gpt-5.6`.
+- [ ] `.env.example` contains only blank `OPENAI_API_KEY`, `OPENAI_SAFETY_PEPPER`, and `OPENAI_LIVE_REQUESTS_ENABLED` values; the pinned model alias remains server code, not an environment override.
 - [ ] No `.env.local`, API key, token, credential, private user information, or build secret is committed.
 - [ ] The exact GPT-5.6 model integration is visible in code and described in the README.
 - [ ] Dated commits and the primary Codex thread show that the work occurred during the Submission Period.

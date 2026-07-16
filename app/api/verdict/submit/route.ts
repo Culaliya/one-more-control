@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
-  FADING_SIGNAL_EXPERIMENT_IDS,
   FADING_SIGNAL_HYPOTHESIS_IDS,
   fadingSignalCase,
 } from "@/data/cases/public/fading-signal";
@@ -13,31 +12,29 @@ import {
 import { validateVerdictSubmission } from "@/lib/game/validation";
 import {
   CaseEngineError,
-  replayFadingSignalHistory,
+  replayFadingSignalTrail,
 } from "@/server/cases/fading-signal-engine";
+import {
+  playerRunTrailEntrySchema,
+  verdictSchema,
+} from "@/server/cases/fading-signal-schemas";
+import { reviewFinalReasoningDetailed } from "@/server/ai/final-reasoning-review";
+import { consumeAiRequestBudget } from "@/server/ai/request-guard";
+import {
+  deriveAiRequestGuardKey,
+  deriveSafetyIdentifier,
+} from "@/server/ai/safety-identifier";
+import { recordSanitizedAiTelemetry } from "@/server/ai/telemetry";
+import { liveAiRequestsEnabled } from "@/server/ai/live-config";
 import { fadingSignalTruth } from "@/server/cases/private/fading-signal-truth";
 
 export const runtime = "nodejs";
 
-const hypothesisIdSchema = z.enum(FADING_SIGNAL_HYPOTHESIS_IDS);
-const experimentIdSchema = z.enum(FADING_SIGNAL_EXPERIMENT_IDS);
-const verdictSchema = z
-  .object({
-    hypothesisId: hypothesisIdSchema,
-    confidence: z.number().int().min(50).max(100),
-    evidenceRunIndexes: z.tuple([
-      z.number().int().nonnegative(),
-      z.number().int().nonnegative(),
-    ]),
-    falsifiedHypothesisId: hypothesisIdSchema,
-    falsifyingEvidenceRunIndex: z.number().int().nonnegative(),
-    explanation: z.string().trim().min(1).max(280).optional(),
-  })
-  .strict();
 const verdictRequestSchema = z
   .object({
     caseId: z.literal("fading-signal"),
-    runHistory: z.array(experimentIdSchema).min(2).max(7),
+    sessionId: z.string().trim().min(8).max(128),
+    runHistory: z.array(playerRunTrailEntrySchema).min(2).max(7),
     verdict: verdictSchema,
   })
   .strict();
@@ -62,7 +59,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const replay = replayFadingSignalHistory(parsed.data.runHistory);
+    const replay = replayFadingSignalTrail(parsed.data.runHistory);
     const session = {
       ...createInitialGameSession(fadingSignalCase, "server-verdict-check"),
       phase: "verdict" as const,
@@ -101,6 +98,32 @@ export async function POST(request: Request) {
     if (!trueHypothesis) {
       throw new CaseEngineError("The authored mechanism is unavailable.");
     }
+    const safetyIdentifier = deriveSafetyIdentifier(parsed.data.sessionId);
+    const guardKey = deriveAiRequestGuardKey({
+      route: "verdict",
+      validatedSessionId: parsed.data.sessionId,
+      request,
+    });
+    const allowModel = Boolean(
+      liveAiRequestsEnabled() &&
+        safetyIdentifier &&
+        guardKey &&
+        consumeAiRequestBudget({
+          key: guardKey,
+          limit: 2,
+          windowMs: 10 * 60_000,
+        }),
+    );
+    const reasoningReview = await reviewFinalReasoningDetailed({
+      caseDefinition: fadingSignalCase,
+      truth: fadingSignalTruth,
+      runs: replay.runs,
+      verdict: parsed.data.verdict,
+      score,
+      allowModel,
+      safetyIdentifier,
+    });
+    recordSanitizedAiTelemetry(reasoningReview.telemetry);
 
     return NextResponse.json(
       {
@@ -114,6 +137,7 @@ export async function POST(request: Request) {
         budgetSpent: replay.budgetSpent,
         score,
         fingerprint,
+        reasoningReview: reasoningReview.value,
       },
       { headers: { "Cache-Control": "no-store" } },
     );

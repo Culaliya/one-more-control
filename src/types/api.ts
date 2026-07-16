@@ -26,7 +26,7 @@ export interface DebriefResponse {
   reveal: {
     title: string;
     explanation: string;
-    optimalPath: readonly ExperimentId[];
+    featuredDecisivePath: readonly ExperimentId[];
     takeaway: string;
   };
   enginePosterior: ProbabilityDistribution;
@@ -35,6 +35,17 @@ export interface DebriefResponse {
   budgetSpent: number;
   score: ScoreBreakdown;
   fingerprint: ReasoningFingerprint;
+  reasoningReview: FinalReasoningReview;
+}
+
+export interface FinalReasoningReview {
+  claimSupported: boolean;
+  strongestReasoningMove: string;
+  unsupportedLeap: string | null;
+  evidencePlayerUnderused: string | null;
+  oneMoreControl: string;
+  summary: string;
+  source: "gpt-5.6" | "fallback";
 }
 
 export interface ApiErrorResponse {

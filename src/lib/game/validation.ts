@@ -29,6 +29,7 @@ export const FORBIDDEN_PUBLIC_CASE_KEYS = new Set([
   "reveal",
   "debrief",
   "optimalPath",
+  "featuredDecisivePath",
 ]);
 
 export function containsForbiddenTruthFields(value: unknown): boolean {
@@ -186,9 +187,12 @@ export function validatePrivateCaseTruth(
       });
     }
   }
-  for (const experimentId of truth.debrief.optimalPath) {
+  for (const experimentId of truth.debrief.featuredDecisivePath) {
     if (!experiments.has(experimentId)) {
-      issues.push({ path: "debrief.optimalPath", message: "Optimal path contains an unknown experiment." });
+      issues.push({
+        path: "debrief.featuredDecisivePath",
+        message: "Featured decisive path contains an unknown experiment.",
+      });
     }
   }
 
@@ -225,19 +229,26 @@ export function validatePlayerPrediction(
   hypothesisIds: readonly HypothesisId[],
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
-  if (prediction.splitGroups.length !== 2) {
-    issues.push({ path: "splitGroups", message: "Prediction must contain two outcome groups." });
-    return issues;
-  }
-  const placed = prediction.splitGroups.flat();
+  const placed = prediction.mode === "split"
+    ? prediction.splitGroups.flat()
+    : [...prediction.hypothesisIds];
   if (
     placed.length !== hypothesisIds.length ||
     new Set(placed).size !== placed.length ||
     placed.some((id) => !hypothesisIds.includes(id))
   ) {
     issues.push({
+      path: prediction.mode === "split" ? "splitGroups" : "hypothesisIds",
+      message: "The prediction must include every hypothesis exactly once.",
+    });
+  }
+  if (
+    prediction.mode === "split" &&
+    prediction.splitGroups.some((group) => group.length === 0)
+  ) {
+    issues.push({
       path: "splitGroups",
-      message: "Every hypothesis must appear in exactly one prediction group.",
+      message: "A split prediction must use both outcome groups.",
     });
   }
   if ((prediction.rationale?.length ?? 0) > 240 || prediction.rationale?.includes("\n")) {
@@ -255,8 +266,8 @@ export function validateVerdictSubmission(
   if (!hypothesisIds.includes(verdict.hypothesisId)) {
     issues.push({ path: "hypothesisId", message: "Verdict hypothesis is unknown." });
   }
-  if (!Number.isInteger(verdict.confidence) || verdict.confidence < 50 || verdict.confidence > 100) {
-    issues.push({ path: "confidence", message: "Confidence must be an integer from 50 to 100." });
+  if (!Number.isInteger(verdict.confidence) || verdict.confidence < 34 || verdict.confidence > 100) {
+    issues.push({ path: "confidence", message: "Confidence must be an integer from 34 to 100." });
   }
   const evidence = verdict.evidenceRunIndexes;
   if (
@@ -298,4 +309,3 @@ export function canRunExperiment(
     session.budgetRemaining >= experiment.cost
   );
 }
-

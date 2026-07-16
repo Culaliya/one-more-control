@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
-  FADING_SIGNAL_EXPERIMENT_IDS,
   FADING_SIGNAL_HYPOTHESIS_IDS,
   fadingSignalCase,
   getFadingSignalExperiment,
@@ -15,27 +14,20 @@ import {
   replayFadingSignalHistory,
   validateExperimentHistory,
 } from "@/server/cases/fading-signal-engine";
+import {
+  fadingSignalExperimentIdSchema,
+  playerPredictionSchema,
+} from "@/server/cases/fading-signal-schemas";
 import { fadingSignalTruth } from "@/server/cases/private/fading-signal-truth";
 
 export const runtime = "nodejs";
 
-const hypothesisIdSchema = z.enum(FADING_SIGNAL_HYPOTHESIS_IDS);
-const experimentIdSchema = z.enum(FADING_SIGNAL_EXPERIMENT_IDS);
-const predictionSchema = z
-  .object({
-    splitGroups: z.tuple([
-      z.array(hypothesisIdSchema).min(1).max(2),
-      z.array(hypothesisIdSchema).min(1).max(2),
-    ]),
-    rationale: z.string().trim().min(1).max(180).optional(),
-  })
-  .strict();
 const runRequestSchema = z
   .object({
     caseId: z.literal("fading-signal"),
-    experimentId: experimentIdSchema,
-    runHistory: z.array(experimentIdSchema).max(7),
-    prediction: predictionSchema,
+    experimentId: fadingSignalExperimentIdSchema,
+    runHistory: z.array(fadingSignalExperimentIdSchema).max(7),
+    prediction: playerPredictionSchema,
   })
   .strict();
 
@@ -116,8 +108,12 @@ export async function POST(request: Request) {
         informationGainBits,
         predictionUseful,
         predictionMessage: predictionUseful
-          ? "Your split matched the experiment's discriminating structure."
-          : "This prediction did not isolate two distinct authored expectations.",
+          ? parsed.data.prediction.mode === "no_separation"
+            ? "Correct: all three mechanisms predicted the same dominant outcome."
+            : "Your split matched the experiment's discriminating structure."
+          : parsed.data.prediction.mode === "no_separation"
+            ? "This experiment had authored expectations that could separate mechanisms."
+            : "This split did not match the experiment's authored expectations.",
       },
       { headers: { "Cache-Control": "no-store" } },
     );

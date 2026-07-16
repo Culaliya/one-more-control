@@ -22,9 +22,13 @@ export function ResultPanel({
   const labelById = Object.fromEntries(
     hypotheses.map((hypothesis) => [hypothesis.id, hypothesis.shortLabel]),
   );
-  const predictionLabel = run.prediction.splitGroups
-    .map((group) => group.map((id) => labelById[id] ?? id).join(" + "))
-    .join("  |  ");
+  const predictionLabel = run.prediction.mode === "split"
+    ? run.prediction.splitGroups
+        .map((group) => group.map((id) => labelById[id] ?? id).join(" + "))
+        .join("  |  ")
+    : run.prediction.hypothesisIds
+        .map((id) => labelById[id] ?? id)
+        .join(" + ");
   const lowInformation = run.informationGainBits < 0.1;
 
   return (
@@ -72,6 +76,9 @@ export function ResultPanel({
             ) : (
               <p>This result moved the evidence.</p>
             )}
+            <small className="bits-explainer">
+              Bits measure how much this result changed the probability of the competing mechanisms.
+            </small>
           </div>
 
           <dl className="result-facts">
@@ -84,14 +91,20 @@ export function ResultPanel({
               <dd>−{run.cost} UNITS</dd>
             </div>
             <div>
-              <dt>YOUR PREDICTED SPLIT</dt>
+              <dt>{run.prediction.mode === "split" ? "YOUR PREDICTED SPLIT" : "YOUR PREDICTED PATTERN"}</dt>
               <dd>{predictionLabel}</dd>
             </div>
             <div>
               <dt>PREDICTION VALUE</dt>
               <dd className={run.predictionUseful ? "prediction-useful" : "prediction-limited"}>
                 <span aria-hidden="true">{run.predictionUseful ? "✓" : "△"}</span>{" "}
-                {run.predictionUseful ? "USEFUL SEPARATION" : "LIMITED SEPARATION"}
+                {run.predictionUseful
+                  ? run.prediction.mode === "no_separation"
+                    ? "CORRECT: NO SEPARATION"
+                    : "MATCHED SEPARATION"
+                  : run.prediction.mode === "no_separation"
+                    ? "SEPARATION WAS AVAILABLE"
+                    : "PREDICTION MISSED THE PATTERN"}
               </dd>
             </div>
           </dl>

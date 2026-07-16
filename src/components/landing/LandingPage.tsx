@@ -40,10 +40,6 @@ export function LandingPage() {
           <a href="#cases">CASES</a>
           <a href="#method">METHOD</a>
           <a href="#about">ABOUT</a>
-          {/* TODO(Task 03): replace the disabled control with the accessible hypothesis soundscape. */}
-          <button className="sound-control" type="button" disabled>
-            <span aria-hidden="true">◌</span> SOUND OFF
-          </button>
         </nav>
       </header>
 
@@ -74,7 +70,7 @@ export function LandingPage() {
           </div>
           <p className="hero-microcopy">
             <span className="status-dot" aria-hidden="true" />
-            2 synthetic cases · 10–12 minutes each · No sign-in
+            1 playable case · 10–12 minutes · No sign-in
           </p>
         </div>
 

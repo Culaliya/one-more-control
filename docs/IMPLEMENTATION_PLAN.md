@@ -1,4 +1,6 @@
-# ONE MORE CONTROL — Task 01 Implementation Plan
+# ONE MORE CONTROL — Final as-built architecture
+
+Status: implemented and hardened for the 2026 competition submission. This is an as-built record, not an open implementation plan.
 
 ## Architecture
 
@@ -66,21 +68,21 @@ Guards:
 
 ### `POST /api/ai/observe`
 
-Input: `{ caseId: "fading-signal" }`
+Input: `{ caseId: "fading-signal", sessionId: string }`
 
 Output: schema-validated observation fields plus `source: "gpt-5.6" | "fallback"`.
 
 ### `POST /api/experiment/run`
 
-Input: case ID, experiment ID, ordered prior experiment IDs in `runHistory`, and the prediction split.
+Input: case ID, experiment ID, the validated player trail in `runHistory`, and a split or no-separation prediction.
 
 Output: authored public result, authoritative cost and remaining budget, recomputed prior/posterior, realized information gain, and prediction-quality feedback. No private truth identifier is returned.
 
 ### `POST /api/verdict/submit`
 
-Input: ordered experiment IDs, final hypothesis, confidence, two evidence indexes, a falsified alternative, its contradictory evidence index, and optional explanation.
+Input: case ID, session ID, the validated player trail, final hypothesis, confidence, two evidence indexes, a falsified alternative, and its contradictory evidence index.
 
-Output: final score, revealed mechanism, authored explanation, optimal path, posterior comparison, and reasoning fingerprint.
+Output: final score, revealed mechanism, authored explanation, featured decisive path, posterior comparison, and reasoning fingerprint.
 
 ## Tests
 

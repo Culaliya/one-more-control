@@ -43,9 +43,9 @@ export const fadingSignalCase = {
       "Same substrate concentration",
     ],
     missingControls: [
-      "Independent product readout",
-      "Soluble enzyme abundance",
-      "Post-reaction spike-in",
+      "A chemistry-independent measurement dimension",
+      "An independent check of soluble enzyme amount",
+      "A timing control after product formation",
     ],
     ambiguity:
       "The image cannot show whether chemistry, enzyme amount, or only the optical readout changed.",
@@ -77,7 +77,7 @@ export const fadingSignalCase = {
       shortLabel: "H3",
       title: "Optical interference",
       mechanism:
-        "V-17 masks the fluorescent signal without reducing product formation. A non-fluorescent product measurement remains normal, and post-reaction addition changes the signal immediately.",
+        "V-17 changes how the fluorescent product is detected without necessarily changing product formation. Chemistry and readout can therefore diverge.",
       icon: "◉",
       linePattern: "dot",
       accentColor: "#54DCE4",

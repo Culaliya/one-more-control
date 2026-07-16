@@ -48,6 +48,10 @@ export function LabBoard({
         </div>
       </header>
 
+      <a className="jump-to-experiments" href="#experiment-deck">
+        JUMP TO EXPERIMENTS <span aria-hidden="true">↓</span>
+      </a>
+
       <div className="lab-main-grid">
         <aside className="lab-hypotheses" aria-label="Your current hypothesis beliefs">
           <header><span>YOUR HYPOTHESES</span><small>PLAYER BELIEFS</small></header>
@@ -77,7 +81,7 @@ export function LabBoard({
           </figure>
         </div>
 
-        <aside className="experiment-deck" aria-label="Experiment deck">
+        <aside id="experiment-deck" className="experiment-deck" aria-label="Experiment deck">
           <header>
             <div><span>EXPERIMENT DECK</span><small>CHOOSE FOR SEPARATION</small></div>
             <strong>{session.budgetRemaining}<small>/100</small></strong>

@@ -17,7 +17,7 @@ export const fadingSignalTruth = {
     title: "THE CHEMISTRY NEVER STOPPED.",
     explanation:
       "V-17 changed the instrument's view of the product, not the amount of product. The decisive evidence was temporal and orthogonal: the signal fell after chemistry was complete, while a different measurement found normal product.",
-    optimalPath: [
+    featuredDecisivePath: [
       "post_reaction_spike_in",
       "orthogonal_product_quantification",
     ],
@@ -25,4 +25,3 @@ export const fadingSignalTruth = {
       "A timing control and an independent readout can separate changed chemistry from changed observation.",
   },
 } as const satisfies PrivateCaseTruth;
-

@@ -8,6 +8,8 @@ import {
   updatePosteriorForOutcome,
 } from "../src/lib/game/bayes";
 import { klDivergenceBits } from "../src/lib/game/entropy";
+import { validatePlayerPrediction } from "../src/lib/game/validation";
+import { predictionMatchesExperiment } from "../src/server/cases/fading-signal-engine";
 
 function requireExperiment(id: string) {
   const experiment = getFadingSignalExperiment(id);
@@ -50,5 +52,33 @@ describe("The Fading Signal scientific invariants", () => {
     expect(finalPosterior.optical_interference).toBeGreaterThan(0.99);
     expect(Object.values(finalPosterior).reduce((sum, value) => sum + value, 0)).toBeCloseTo(1, 12);
   });
-});
 
+  it("treats no separation as a first-class prediction", () => {
+    const noSeparation = {
+      mode: "no_separation" as const,
+      hypothesisIds: fadingSignalCase.hypotheses.map(({ id }) => id),
+    };
+    const decisiveSplit = {
+      mode: "split" as const,
+      splitGroups: [
+        ["competitive_inhibition", "enzyme_loss"],
+        ["optical_interference"],
+      ] as const,
+    };
+    expect(
+      validatePlayerPrediction(
+        noSeparation,
+        fadingSignalCase.hypotheses.map(({ id }) => id),
+      ),
+    ).toEqual([]);
+    expect(
+      predictionMatchesExperiment("repeat_fluorescent_assay", noSeparation),
+    ).toBe(true);
+    expect(
+      predictionMatchesExperiment("post_reaction_spike_in", noSeparation),
+    ).toBe(false);
+    expect(
+      predictionMatchesExperiment("post_reaction_spike_in", decisiveSplit),
+    ).toBe(true);
+  });
+});

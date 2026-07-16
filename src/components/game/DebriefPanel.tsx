@@ -34,7 +34,7 @@ export function DebriefPanel({
     {
       label: "REDUNDANCY RATE",
       value: percent(debrief.fingerprint.redundancyRate),
-      note: "Runs returning under 0.10 bits",
+      note: "Non-separating or repeated measurement structures",
     },
     {
       label: "EVIDENCE EFFICIENCY",
@@ -45,6 +45,23 @@ export function DebriefPanel({
       label: "CALIBRATION GAP",
       value: `${debrief.fingerprint.calibrationGapPercentagePoints.toFixed(1)} pts`,
       note: "Your confidence versus the engine posterior",
+    },
+    {
+      label: "PREDICTION ACCURACY",
+      value: percent(debrief.fingerprint.predictionAccuracy),
+      note: "Committed result patterns that matched the authored model",
+    },
+    {
+      label: "NO-SEPARATION RECOGNITION",
+      value: debrief.fingerprint.noSeparationRecognition === null
+        ? "N/A"
+        : percent(debrief.fingerprint.noSeparationRecognition),
+      note: "Correctly recognized tests where every mechanism looked alike",
+    },
+    {
+      label: "BELIEF RESPONSIVENESS",
+      value: percent(debrief.fingerprint.beliefResponsiveness),
+      note: "Player belief movement aligned with the evidence direction",
     },
   ];
 
@@ -119,13 +136,13 @@ export function DebriefPanel({
         </article>
       </div>
 
-      <article className="optimal-path-card">
+        <article className="featured-path-card">
         <header>
-          <div><span>03</span><h2>THE DECISIVE PATH</h2></div>
-          <strong>PAR {caseDefinition.parCost} · YOU SPENT {debrief.budgetSpent}</strong>
+          <div><span>03</span><h2>FEATURED DECISIVE PATH</h2></div>
+          <strong>FEATURED BENCHMARK {caseDefinition.parCost} · YOU SPENT {debrief.budgetSpent}</strong>
         </header>
-        <div className="optimal-path-steps">
-          {debrief.reveal.optimalPath.map((experimentId, index) => {
+        <div className="featured-path-steps">
+          {debrief.reveal.featuredDecisivePath.map((experimentId, index) => {
             const experiment = experimentById[experimentId];
             const playerRunIndex = runs.findIndex((run) => run.experimentId === experimentId);
             return (
@@ -159,11 +176,37 @@ export function DebriefPanel({
         </div>
       </section>
 
+      <article className={`reasoning-review-card${debrief.reasoningReview.claimSupported ? " is-supported" : " is-caution"}`}>
+        <header>
+          <div><span>05</span><h2>FINAL REASONING REVIEW</h2></div>
+          <strong>{debrief.reasoningReview.source === "gpt-5.6" ? "GPT-5.6 · STRICT SCHEMA" : "AUTHORED FALLBACK"}</strong>
+        </header>
+        <p className="reasoning-review-summary">{debrief.reasoningReview.summary}</p>
+        <dl>
+          <div>
+            <dt>STRONGEST MOVE</dt>
+            <dd>{debrief.reasoningReview.strongestReasoningMove}</dd>
+          </div>
+          {debrief.reasoningReview.unsupportedLeap ? (
+            <div>
+              <dt>UNSUPPORTED LEAP</dt>
+              <dd>{debrief.reasoningReview.unsupportedLeap}</dd>
+            </div>
+          ) : null}
+          {debrief.reasoningReview.evidencePlayerUnderused ? (
+            <div>
+              <dt>UNDERUSED EVIDENCE</dt>
+              <dd>{debrief.reasoningReview.evidencePlayerUnderused}</dd>
+            </div>
+          ) : null}
+        </dl>
+      </article>
+
       <article className="one-more-control-card">
         <span>ONE MORE CONTROL</span>
         <div>
-          <h2>What would make the conclusion even stronger?</h2>
-          <p>{debrief.reveal.takeaway}</p>
+          <h2>{debrief.reasoningReview.oneMoreControl}</h2>
+          <p>A stronger conclusion survives another authored measurement dimension without assuming its result.</p>
         </div>
         <i aria-hidden="true">＋</i>
       </article>

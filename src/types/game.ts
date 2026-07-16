@@ -65,6 +65,7 @@ export interface PublicCaseDefinition {
   brief: string;
   question: string;
   initialBudget: number;
+  /** Full-efficiency benchmark for the featured teaching route, not a minimum. */
   parCost: number;
   observationAsset: {
     src: string;
@@ -78,7 +79,7 @@ export interface PublicCaseDefinition {
 export interface PrivateCaseDebrief {
   title: string;
   explanation: string;
-  optimalPath: readonly ExperimentId[];
+  featuredDecisivePath: readonly ExperimentId[];
   takeaway: string;
 }
 
@@ -89,12 +90,31 @@ export interface PrivateCaseTruth {
   debrief: PrivateCaseDebrief;
 }
 
-export interface PlayerPrediction {
+export interface SplitPlayerPrediction {
+  mode: "split";
   splitGroups: readonly [
     readonly HypothesisId[],
     readonly HypothesisId[],
   ];
   rationale?: string;
+}
+
+export interface NoSeparationPlayerPrediction {
+  mode: "no_separation";
+  hypothesisIds: readonly HypothesisId[];
+  rationale?: string;
+}
+
+export type PlayerPrediction =
+  | SplitPlayerPrediction
+  | NoSeparationPlayerPrediction;
+
+export interface PlayerRunTrailEntry {
+  experimentId: ExperimentId;
+  prediction: PlayerPrediction;
+  playerBeliefsBefore: PlayerBeliefs;
+  playerBeliefsAfter: PlayerBeliefs;
+  createdAt: string;
 }
 
 export interface ExperimentRun {
@@ -131,7 +151,7 @@ export interface VerdictSubmission {
 }
 
 export interface GameSession {
-  schemaVersion: 1;
+  schemaVersion: 2;
   id: string;
   caseId: string;
   caseVersion: number;
@@ -157,5 +177,7 @@ export interface ReasoningFingerprint {
   redundancyRate: number;
   evidenceEfficiency: number;
   calibrationGapPercentagePoints: number;
+  predictionAccuracy: number;
+  noSeparationRecognition: number | null;
+  beliefResponsiveness: number;
 }
-

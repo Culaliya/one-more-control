@@ -39,7 +39,10 @@ function authoredRun(
     experimentId: experiment.id,
     cost: experiment.cost,
     outcomeId,
-    prediction: { splitGroups: [["competitive_inhibition", "enzyme_loss"], ["optical_interference"]] },
+    prediction: {
+      mode: "split",
+      splitGroups: [["competitive_inhibition", "enzyme_loss"], ["optical_interference"]],
+    },
     predictionUseful: true,
     enginePrior: session.enginePosterior,
     enginePosterior: posterior,
@@ -140,4 +143,3 @@ describe("game reducer invariants", () => {
     else process.env.OPENAI_API_KEY = previousKey;
   });
 });
-

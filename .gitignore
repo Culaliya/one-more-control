@@ -42,3 +42,7 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+/artifacts/ai-copy-guard/
+/artifacts/api-smoke/
+/artifacts/competition-record/
+/artifacts/GPT56_HANDOFF_*.md

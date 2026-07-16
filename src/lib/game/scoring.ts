@@ -1,3 +1,7 @@
+import {
+  createUniformDistribution,
+  updatePosteriorForOutcome,
+} from "./bayes";
 import type {
   ExperimentDefinition,
   ExperimentRun,
@@ -10,7 +14,8 @@ import type {
 
 const DECISIVE_LIKELIHOOD_GAP = 0.5;
 const CONFLICTING_LIKELIHOOD_MAX = 0.1;
-const REDUNDANT_INFORMATION_BITS = 0.1;
+const JOINT_SELECTED_POSTERIOR_MIN = 0.95;
+const JOINT_ALTERNATIVE_POSTERIOR_MAX = 0.05;
 
 export class ScoringError extends Error {
   constructor(message: string) {
@@ -45,6 +50,46 @@ function requireExperiment(
   return experiment;
 }
 
+function dominantOutcomeForHypothesis(
+  experiment: ExperimentDefinition,
+  hypothesisId: string,
+): string | undefined {
+  const distribution = experiment.likelihoods[hypothesisId];
+  return distribution
+    ? Object.entries(distribution).sort((left, right) => right[1] - left[1])[0]?.[0]
+    : undefined;
+}
+
+function predictionPartitionSignature(
+  experiment: ExperimentDefinition,
+): string {
+  return Object.keys(experiment.likelihoods)
+    .map(
+      (hypothesisId) =>
+        `${hypothesisId}:${dominantOutcomeForHypothesis(experiment, hypothesisId) ?? "unknown"}`,
+    )
+    .sort()
+    .join("|");
+}
+
+function experimentHasNoSeparation(
+  experiment: ExperimentDefinition,
+): boolean {
+  const outcomes = new Set(
+    Object.keys(experiment.likelihoods).map((hypothesisId) =>
+      dominantOutcomeForHypothesis(experiment, hypothesisId),
+    ),
+  );
+  return outcomes.size === 1 && !outcomes.has(undefined);
+}
+
+function measurementFamily(experiment: ExperimentDefinition): string {
+  if (["repeat", "titration", "rescue"].includes(experiment.category)) {
+    return "same_fluorescent_readout";
+  }
+  return experiment.category;
+}
+
 export function experimentCanFalsify(
   experiment: ExperimentDefinition,
 ): boolean {
@@ -65,14 +110,31 @@ export function resultSupportsHypothesis(
   if (selectedLikelihood === undefined) {
     return false;
   }
-  const likelihoods = Object.values(experiment.likelihoods).map(
-    (distribution) => distribution[run.outcomeId],
-  );
-  const strongest = Math.max(...likelihoods);
-  const weakest = Math.min(...likelihoods);
-  return (
-    selectedLikelihood >= strongest - 1e-9 &&
-    strongest - weakest >= DECISIVE_LIKELIHOOD_GAP
+  const competitorLikelihoods = Object.entries(experiment.likelihoods)
+    .filter(([candidateId]) => candidateId !== hypothesisId)
+    .map(([, distribution]) => distribution[run.outcomeId]);
+  const strongestCompetitor = Math.max(...competitorLikelihoods);
+  return selectedLikelihood - strongestCompetitor >= DECISIVE_LIKELIHOOD_GAP;
+}
+
+function contradictedAlternatives(
+  run: ExperimentRun,
+  experiment: ExperimentDefinition,
+  selectedHypothesisId: string,
+): Set<string> {
+  const selectedLikelihood = experiment.likelihoods[selectedHypothesisId]?.[run.outcomeId];
+  if (selectedLikelihood === undefined) return new Set();
+  return new Set(
+    Object.entries(experiment.likelihoods)
+      .filter(([hypothesisId, distribution]) => {
+        if (hypothesisId === selectedHypothesisId) return false;
+        const alternativeLikelihood = distribution[run.outcomeId];
+        return (
+          alternativeLikelihood <= CONFLICTING_LIKELIHOOD_MAX &&
+          selectedLikelihood - alternativeLikelihood >= DECISIVE_LIKELIHOOD_GAP
+        );
+      })
+      .map(([hypothesisId]) => hypothesisId),
   );
 }
 
@@ -80,36 +142,85 @@ export function calculateBudgetEfficiencyScore(
   budgetSpent: number,
   parCost: number,
   initialBudget: number,
+  evidenceSufficient = true,
 ): number {
-  if (budgetSpent <= parCost) {
-    return 15;
-  }
-  if (initialBudget <= parCost) {
-    return 0;
-  }
-  const remainingShare =
-    (initialBudget - budgetSpent) / (initialBudget - parCost);
-  return round(15 * clamp(remainingShare, 0, 1), 2);
+  const rawScore = budgetSpent <= parCost
+    ? 15
+    : initialBudget <= parCost
+      ? 0
+      : 15 * clamp(
+          (initialBudget - budgetSpent) / (initialBudget - parCost),
+          0,
+          1,
+        );
+  return round(evidenceSufficient ? rawScore : Math.min(5, rawScore), 2);
 }
 
 function scoreEvidenceChain(
+  caseDefinition: PublicCaseDefinition,
   runs: readonly ExperimentRun[],
   verdict: VerdictSubmission,
   byId: ReadonlyMap<string, ExperimentDefinition>,
 ): number {
-  const uniqueIndexes = new Set(verdict.evidenceRunIndexes);
-  let score = 0;
-  for (const index of uniqueIndexes) {
-    const run = runs[index];
-    if (!run) {
-      continue;
-    }
-    const experiment = requireExperiment(byId, run.experimentId);
-    if (resultSupportsHypothesis(run, experiment, verdict.hypothesisId)) {
-      score += 10;
-    }
+  const selectedRuns = verdict.evidenceRunIndexes.map((index) => runs[index]);
+  if (selectedRuns.some((run) => !run)) return 0;
+
+  let posterior = createUniformDistribution(
+    caseDefinition.hypotheses.map((hypothesis) => hypothesis.id),
+  );
+  const experiments = selectedRuns.map((run) =>
+    requireExperiment(byId, run.experimentId),
+  );
+  selectedRuns.forEach((run, index) => {
+    posterior = updatePosteriorForOutcome(
+      posterior,
+      experiments[index],
+      run.outcomeId,
+    );
+  });
+
+  const selectedPosterior = posterior[verdict.hypothesisId] ?? 0;
+  const alternatives = Object.entries(posterior)
+    .filter(([hypothesisId]) => hypothesisId !== verdict.hypothesisId)
+    .map(([, probability]) => probability);
+  const jointEvidenceSufficient =
+    selectedPosterior >= JOINT_SELECTED_POSTERIOR_MIN &&
+    alternatives.every(
+      (probability) => probability <= JOINT_ALTERNATIVE_POSTERIOR_MAX,
+    );
+  const contributionSets = selectedRuns.map((run, index) =>
+    contradictedAlternatives(
+      run,
+      experiments[index],
+      verdict.hypothesisId,
+    ),
+  );
+  const distinctContributions = contributionSets.every((contribution, index) =>
+    [...contribution].some((hypothesisId) =>
+      contributionSets.every(
+        (other, otherIndex) => otherIndex === index || !other.has(hypothesisId),
+      ),
+    ),
+  );
+  const complementaryMeasurements =
+    experiments.every((experiment, index) =>
+      resultSupportsHypothesis(
+        selectedRuns[index],
+        experiment,
+        verdict.hypothesisId,
+      ),
+    ) &&
+    new Set(experiments.map(measurementFamily)).size === experiments.length;
+
+  if (jointEvidenceSufficient && (distinctContributions || complementaryMeasurements)) {
+    return 20;
   }
-  return Math.min(20, score);
+  if (jointEvidenceSufficient) {
+    return 10;
+  }
+  return selectedPosterior >= 0.75 && contributionSets.some((set) => set.size > 0)
+    ? 5
+    : 0;
 }
 
 function scoreFalsificationQuality(
@@ -122,15 +233,11 @@ function scoreFalsificationQuality(
     return 0;
   }
   const experiment = requireExperiment(byId, run.experimentId);
-  const falsifiedLikelihood =
-    experiment.likelihoods[verdict.falsifiedHypothesisId]?.[run.outcomeId];
-  const selectedLikelihood =
-    experiment.likelihoods[verdict.hypothesisId]?.[run.outcomeId];
-  if (falsifiedLikelihood === undefined || selectedLikelihood === undefined) {
-    return 0;
-  }
-  return falsifiedLikelihood <= CONFLICTING_LIKELIHOOD_MAX &&
-    selectedLikelihood - falsifiedLikelihood >= DECISIVE_LIKELIHOOD_GAP
+  return contradictedAlternatives(
+    run,
+    experiment,
+    verdict.hypothesisId,
+  ).has(verdict.falsifiedHypothesisId)
     ? 15
     : 0;
 }
@@ -152,11 +259,17 @@ export function scoreVerdict({
   const budgetSpent = runs.reduce((sum, run) => sum + run.cost, 0);
   const correctMechanism =
     verdict.hypothesisId === truth.trueHypothesisId ? 50 : 0;
-  const evidenceChain = scoreEvidenceChain(runs, verdict, byId);
+  const evidenceChain = scoreEvidenceChain(
+    caseDefinition,
+    runs,
+    verdict,
+    byId,
+  );
   const budgetEfficiency = calculateBudgetEfficiencyScore(
     budgetSpent,
     caseDefinition.parCost,
     caseDefinition.initialBudget,
+    evidenceChain === 20,
   );
   const falsificationQuality = scoreFalsificationQuality(
     runs,
@@ -179,6 +292,39 @@ export function scoreVerdict({
   };
 }
 
+function beliefResponsiveness(run: ExperimentRun): number {
+  const hypothesisIds = Object.keys(run.enginePosterior);
+  const engineDelta = hypothesisIds.map(
+    (hypothesisId) =>
+      (run.enginePosterior[hypothesisId] ?? 0) -
+      (run.enginePrior[hypothesisId] ?? 0),
+  );
+  const playerAfter = run.playerBeliefsAfter ?? run.playerBeliefsBefore;
+  const playerDelta = hypothesisIds.map(
+    (hypothesisId) =>
+      ((playerAfter[hypothesisId] ?? 0) -
+        (run.playerBeliefsBefore[hypothesisId] ?? 0)) /
+      100,
+  );
+  const engineNorm = Math.sqrt(
+    engineDelta.reduce((sum, value) => sum + value ** 2, 0),
+  );
+  const playerNorm = Math.sqrt(
+    playerDelta.reduce((sum, value) => sum + value ** 2, 0),
+  );
+  if (playerNorm < 1e-9) {
+    return run.informationGainBits < 0.1 ? 1 : 0;
+  }
+  if (engineNorm < 1e-9) {
+    return 1;
+  }
+  const dotProduct = engineDelta.reduce(
+    (sum, value, index) => sum + value * playerDelta[index],
+    0,
+  );
+  return clamp((dotProduct / (engineNorm * playerNorm) + 1) / 2, 0, 1);
+}
+
 export interface ReasoningFingerprintInput {
   runs: readonly ExperimentRun[];
   experiments: readonly ExperimentDefinition[];
@@ -193,15 +339,22 @@ export function calculateReasoningFingerprint({
   enginePosterior,
 }: ReasoningFingerprintInput): ReasoningFingerprint {
   const byId = experimentMap(experiments);
+  const calibrationGapPercentagePoints = round(
+    Math.abs(
+      verdict.confidence -
+        (enginePosterior[verdict.hypothesisId] ?? 0) * 100,
+    ),
+    2,
+  );
   if (runs.length === 0) {
     return {
       falsificationIndex: 0,
       redundancyRate: 0,
       evidenceEfficiency: 0,
-      calibrationGapPercentagePoints: round(
-        Math.abs(verdict.confidence - (enginePosterior[verdict.hypothesisId] ?? 0) * 100),
-        2,
-      ),
+      calibrationGapPercentagePoints,
+      predictionAccuracy: 0,
+      noSeparationRecognition: null,
+      beliefResponsiveness: 0,
     };
   }
 
@@ -209,16 +362,40 @@ export function calculateReasoningFingerprint({
   let redundantRuns = 0;
   let totalInformation = 0;
   let budgetSpent = 0;
+  let accuratePredictions = 0;
+  let noSeparationOpportunities = 0;
+  let recognizedNoSeparation = 0;
+  let responsivenessTotal = 0;
+  const previousExperimentSignatures: Array<{
+    family: string;
+    signature: string;
+  }> = [];
+
   for (const run of runs) {
     const experiment = requireExperiment(byId, run.experimentId);
-    if (experimentCanFalsify(experiment)) {
-      falsifyingRuns += 1;
-    }
-    if (run.informationGainBits < REDUNDANT_INFORMATION_BITS) {
+    const signature = predictionPartitionSignature(experiment);
+    const family = measurementFamily(experiment);
+    const noSeparation = experimentHasNoSeparation(experiment);
+    if (experimentCanFalsify(experiment)) falsifyingRuns += 1;
+    if (
+      noSeparation ||
+      previousExperimentSignatures.some(
+        (previous) => previous.signature === signature && previous.family === family,
+      )
+    ) {
       redundantRuns += 1;
     }
+    if (run.predictionUseful) accuratePredictions += 1;
+    if (noSeparation) {
+      noSeparationOpportunities += 1;
+      if (run.prediction.mode === "no_separation" && run.predictionUseful) {
+        recognizedNoSeparation += 1;
+      }
+    }
+    responsivenessTotal += beliefResponsiveness(run);
     totalInformation += run.informationGainBits;
     budgetSpent += run.cost;
+    previousExperimentSignatures.push({ family, signature });
   }
 
   return {
@@ -226,13 +403,11 @@ export function calculateReasoningFingerprint({
     redundancyRate: round(redundantRuns / runs.length),
     evidenceEfficiency:
       budgetSpent > 0 ? round(totalInformation / budgetSpent, 6) : 0,
-    calibrationGapPercentagePoints: round(
-      Math.abs(
-        verdict.confidence -
-          (enginePosterior[verdict.hypothesisId] ?? 0) * 100,
-      ),
-      2,
-    ),
+    calibrationGapPercentagePoints,
+    predictionAccuracy: round(accuratePredictions / runs.length),
+    noSeparationRecognition: noSeparationOpportunities > 0
+      ? round(recognizedNoSeparation / noSeparationOpportunities)
+      : null,
+    beliefResponsiveness: round(responsivenessTotal / runs.length),
   };
 }
-
