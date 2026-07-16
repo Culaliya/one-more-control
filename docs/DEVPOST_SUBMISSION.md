@@ -62,24 +62,24 @@ At the end, the player submits a mechanism, cites two results, falsifies an alte
 
 We built ONE MORE CONTROL as an English-first responsive Next.js application with TypeScript, Tailwind CSS, and the official OpenAI JavaScript SDK.
 
-GPT-5.6 uses the Responses API to interpret a locally generated synthetic observation image. A strict structured-output schema limits the response to visible evidence, controls, missing controls, ambiguity, and confidence. The model cannot rank hypotheses, reveal the mechanism, give wet-lab instructions, or invent an outcome. If the API is unavailable or its response fails validation, an authored fallback keeps the game fully playable.
+GPT-5.6 serves two bounded roles through the Responses API. First, it interprets a locally generated synthetic observation image. A strict structured-output schema limits that response to visible evidence, controls, missing controls, ambiguity, and confidence. Second, after deterministic scoring, it reviews only the server-validated reasoning trail and returns constrained feedback. The model cannot rank the starting hypotheses, reveal the mechanism early, give wet-lab instructions, invent an experiment or outcome, or alter the result trail. If either route is unavailable or fails semantic validation, an authored fallback keeps the game fully playable.
 
-The scientific truth lives in a separate server-only module. The experiment route validates the player's action, returns a pre-authored result, and recomputes the Bayesian posterior from run history rather than trusting the browser. Small pure functions handle normalization, KL information gain, scoring, budget rules, and state transitions. Anonymous progress stays in local storage, so the demo needs no account or database.
+The scientific truth lives in a separate server-only module. The experiment route validates the player's action, returns a pre-authored result, and recomputes the Bayesian posterior from run history rather than trusting the browser. Server code owns claim support, score, posterior, budget, cost, every experimental outcome, and the true mechanism. GPT-5.6 may review observed, server-validated outcomes after scoring, but it cannot create, change, or score a result. Small pure functions handle normalization, KL information gain, scoring, budget rules, and state transitions. Anonymous progress stays in local storage, so the demo needs no account or database.
 
 Codex helped us turn the product blueprint into an implementation plan, establish the AI/truth boundary, build the interface and state machine, implement the deterministic case engine, generate invariant-focused tests, and refine the end-to-end player experience. We kept the product, scientific, engineering, and visual decisions explicit throughout the primary build thread.
 
 ### Challenges we ran into
 
-The hardest design problem was deciding what AI should not do. Allowing a model to invent experiments would make the experience flexible but scientifically untrustworthy. We separated interpretation from truth: GPT-5.6 can help a player inspect evidence, while deterministic authored code controls every experimental outcome.
+The hardest design problem was deciding what AI should not do. Allowing a model to invent experiments would make the experience flexible but scientifically untrustworthy. We separated interpretation and review from truth: GPT-5.6 can help a player inspect the opening observation and review a completed reasoning trail, while deterministic authored code controls every outcome, numeric update, score, and claim-support decision.
 
-A second challenge was making Bayesian information gain understandable without turning the game into a statistics lecture. We connected the math to visible consequences: a limited budget, prediction splits, hypothesis survival states, and a warning when an experiment adds more data but almost no information.
+A second challenge was making Bayesian information gain understandable without turning the game into a statistics lecture. We connected the math to visible consequences: a limited budget, prediction splits, hypothesis survival states, and result roles that distinguish low-value repetition from a low-increment but independent confirmation.
 
 We also needed to keep the hidden answer off the client while preserving a smooth anonymous game. Server-only truth, validated run history, and a separate verdict route let the debrief reveal the mechanism without shipping it in the browser bundle.
 
 ### Accomplishments that we're proud of
 
 - A complete briefing-to-debrief game loop built around falsification rather than chat.
-- A real GPT-5.6 vision feature with strict structured output and a reliable authored fallback.
+- Two bounded GPT-5.6 features—observation interpretation and post-score reasoning review—with strict structured output and reliable authored fallbacks.
 - Deterministic experimental truth that the language model cannot rewrite.
 - A tested Bayesian engine that makes low-information repetition visibly different from decisive controls.
 - A reasoning fingerprint that turns scientific habits into player-facing feedback.
@@ -97,11 +97,13 @@ After that, we would add restricted natural-language mapping to pre-authored exp
 
 ### AI and Codex disclosure
 
-GPT-5.6 is integrated into the product through a schema-bound image-interpretation route. It describes the synthetic observation and missing controls but cannot generate experimental outcomes or reveal the answer. Codex was the primary development collaborator for architecture, implementation, tests, visual iteration, and verification. The submitted `/feedback` Session ID points to the main thread where the majority of the core functionality was built.
+GPT-5.6 is used in two bounded server-side routes. First, it interprets the visible synthetic observation through strict structured output. Second, after deterministic scoring, it reviews only the server-validated reasoning trail. Server code owns every experimental outcome, posterior, cost, score, true mechanism, and claim-support decision; model output that invents an outcome, number, or experiment is rejected in favor of an authored fallback.
+
+Codex was the primary development collaborator for architecture, implementation, tests, visual iteration, truth-boundary hardening, and responsive verification. The submitted `/feedback` Session ID points to the main thread where the majority of the core functionality was built.
 
 ### Testing instructions for judges
 
-1. Open `https://one-more-control.culaliya.chatgpt.site`. No sign-in is required after the site is switched from owner-only review to public access.
+1. Open `https://one-more-control.culaliya.chatgpt.site`. The production site is public and requires no sign-in.
 2. Select **ENTER CASE 01** and choose **ANALYZE THE OBSERVATION**. A visible source indicator identifies the live GPT-5.6 response or the authored fallback.
 3. Allocate priors across all three hypotheses and lock them.
 4. For the clearest short path, run **Post-reaction spike-in** and then **Orthogonal product quantification**. Complete the prediction gate and belief update after each result.
@@ -123,7 +125,7 @@ Target runtime: **2:50–2:55**. The Official Rules say the video should be less
 | 1:05–1:30 | Prediction gate for the post-reaction spike-in, then its authored result | Explain that every test costs budget and requires a falsifiable prediction. Emphasize that the result comes from deterministic server-side truth. |
 | 1:30–1:52 | Update beliefs, then show the orthogonal product result | “A different measurement finds normal product. Together, timing and an orthogonal readout make optical interference the surviving mechanism.” |
 | 1:52–2:14 | Verdict form followed by debrief and reasoning fingerprint | Show the evidence chain, revealed mechanism, budget efficiency, redundancy, falsification, and calibration feedback. |
-| 2:14–2:34 | Simple architecture graphic or clean code split: GPT schema / server truth / pure Bayesian engine | Explain how GPT-5.6 interprets, the authored engine owns truth, and the fallback keeps the game runnable. |
+| 2:14–2:34 | Debrief reasoning review plus the visible deterministic score and fingerprint | Explain the second bounded GPT-5.6 role: it reviews the validated trail only after server scoring, while server code owns claim support and every number. |
 | 2:34–2:47 | Brief view of the primary Codex thread, dated commits, or passing checks with private information cropped | “Codex helped plan the boundary, implement the game and probability engine, generate tests, and refine the complete responsive flow.” |
 | 2:47–2:53 | Return to landing hero and title card | Close with: “Do not ask AI for the answer. Ask what evidence would prove it wrong.” |
 
@@ -137,7 +139,7 @@ Target runtime: **2:50–2:55**. The Official Rules say the video should be less
 - [ ] Narration and on-screen submission material are English, or complete English translations are supplied.
 - [ ] No credentials, API keys, private account information, or unrelated notifications are visible.
 - [ ] Music, fonts, images, icons, trademarks, and other third-party material are owned, licensed, or omitted.
-- [ ] Captions have been reviewed for scientific terms such as “Bayesian,” “falsification,” and “orthogonal.”
+- [ ] Captions have been reviewed for “Bayesian,” “falsification,” “orthogonal,” “V-17,” “GPT-5.6,” and “Codex.”
 - [ ] The YouTube URL works in a logged-out browser window.
 
 ## Screenshot checklist

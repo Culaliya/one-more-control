@@ -2,6 +2,11 @@ import {
   createUniformDistribution,
   updatePosteriorForOutcome,
 } from "./bayes";
+import {
+  experimentHasNoSeparation,
+  measurementFamily,
+  predictionPartitionSignature,
+} from "./experiment-structure";
 import type {
   ExperimentDefinition,
   ExperimentRun,
@@ -48,46 +53,6 @@ function requireExperiment(
     throw new ScoringError(`Unknown experiment ${experimentId}.`);
   }
   return experiment;
-}
-
-function dominantOutcomeForHypothesis(
-  experiment: ExperimentDefinition,
-  hypothesisId: string,
-): string | undefined {
-  const distribution = experiment.likelihoods[hypothesisId];
-  return distribution
-    ? Object.entries(distribution).sort((left, right) => right[1] - left[1])[0]?.[0]
-    : undefined;
-}
-
-function predictionPartitionSignature(
-  experiment: ExperimentDefinition,
-): string {
-  return Object.keys(experiment.likelihoods)
-    .map(
-      (hypothesisId) =>
-        `${hypothesisId}:${dominantOutcomeForHypothesis(experiment, hypothesisId) ?? "unknown"}`,
-    )
-    .sort()
-    .join("|");
-}
-
-function experimentHasNoSeparation(
-  experiment: ExperimentDefinition,
-): boolean {
-  const outcomes = new Set(
-    Object.keys(experiment.likelihoods).map((hypothesisId) =>
-      dominantOutcomeForHypothesis(experiment, hypothesisId),
-    ),
-  );
-  return outcomes.size === 1 && !outcomes.has(undefined);
-}
-
-function measurementFamily(experiment: ExperimentDefinition): string {
-  if (["repeat", "titration", "rescue"].includes(experiment.category)) {
-    return "same_fluorescent_readout";
-  }
-  return experiment.category;
 }
 
 export function experimentCanFalsify(

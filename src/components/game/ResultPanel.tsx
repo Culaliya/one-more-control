@@ -4,17 +4,20 @@ import type {
   ExperimentRun,
   HypothesisDefinition,
 } from "@/types/game";
+import { classifyResultInformationRole } from "@/lib/game/experiment-structure";
 import { ExperimentGlyph } from "./ExperimentGlyph";
 
 export function ResultPanel({
   run,
   experiment,
+  priorExperiments,
   outcome,
   hypotheses,
   onContinue,
 }: {
   run: ExperimentRun;
   experiment: ExperimentDefinition;
+  priorExperiments: readonly ExperimentDefinition[];
   outcome: ExperimentOutcome;
   hypotheses: readonly HypothesisDefinition[];
   onContinue: () => void;
@@ -29,11 +32,26 @@ export function ResultPanel({
     : run.prediction.hypothesisIds
         .map((id) => labelById[id] ?? id)
         .join(" + ");
-  const lowInformation = run.informationGainBits < 0.1;
+  const informationRole = classifyResultInformationRole({
+    experiment,
+    priorExperiments,
+    informationGainBits: run.informationGainBits,
+    predictionUseful: run.predictionUseful,
+  });
+  const resultClass = informationRole === "low_value"
+    ? "result-low"
+    : informationRole === "independent_confirmation"
+      ? "result-confirmation"
+      : "result-decisive";
+  const calloutClass = informationRole === "low_value"
+    ? "is-low"
+    : informationRole === "independent_confirmation"
+      ? "is-confirmation"
+      : "is-decisive";
 
   return (
     <section
-      className={`result-panel ${lowInformation ? "result-low" : "result-decisive"}`}
+      className={`result-panel ${resultClass}`}
       aria-labelledby="result-title"
     >
       <header className="result-title-row">
@@ -65,16 +83,18 @@ export function ResultPanel({
         </figure>
 
         <aside className="result-analysis" aria-label="Result analysis">
-          <div className={`information-callout${lowInformation ? " is-low" : " is-decisive"}`}>
+          <div className={`information-callout ${calloutClass}`}>
             <span>REALIZED INFORMATION</span>
             <strong>{run.informationGainBits.toFixed(3)}<small> BITS</small></strong>
             <div className="information-scale" aria-hidden="true">
               <i style={{ width: `${Math.min(100, run.informationGainBits * 72)}%` }} />
             </div>
-            {lowInformation ? (
+            {informationRole === "low_value" ? (
               <p>MORE DATA. ALMOST NO INFORMATION.</p>
+            ) : informationRole === "independent_confirmation" ? (
+              <p>LOW INCREMENTAL UPDATE.<br />INDEPENDENT CONFIRMATION.</p>
             ) : (
-              <p>This result moved the evidence.</p>
+              <p>THIS RESULT MOVED THE EVIDENCE.</p>
             )}
             <small className="bits-explainer">
               Bits measure how much this result changed the probability of the competing mechanisms.

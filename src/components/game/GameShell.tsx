@@ -545,6 +545,13 @@ export function GameShell({
   const latestOutcome = latestExperiment?.possibleOutcomes.find(
     (outcome) => outcome.id === latestRun?.outcomeId,
   );
+  const priorExperiments: ExperimentDefinition[] = [];
+  for (const priorRun of session.runs.slice(0, -1)) {
+    const priorExperiment = caseDefinition.experiments.find(
+      (experiment) => experiment.id === priorRun.experimentId,
+    );
+    if (priorExperiment) priorExperiments.push(priorExperiment);
+  }
 
   return (
     <main className={`game-shell game-phase-${session.phase}`}>
@@ -628,6 +635,7 @@ export function GameShell({
         <ResultPanel
           run={latestRun}
           experiment={latestExperiment}
+          priorExperiments={priorExperiments}
           outcome={latestOutcome}
           hypotheses={caseDefinition.hypotheses}
           onContinue={() => {

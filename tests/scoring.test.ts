@@ -71,6 +71,7 @@ describe("score and reasoning fingerprint", () => {
 
   it("awards the full 100 points to the ideal 39-unit evidence chain", () => {
     const runs = idealRuns();
+    expect(100 - runs.reduce((total, run) => total + run.cost, 0)).toBe(61);
     expect(scoreVerdict({ caseDefinition: fadingSignalCase, truth, runs, verdict })).toEqual({
       correctMechanism: 50,
       evidenceChain: 20,
@@ -90,6 +91,8 @@ describe("score and reasoning fingerprint", () => {
       falsifiedHypothesisId: "enzyme_loss",
       falsifyingEvidenceRunIndex: 0,
     };
+
+    expect(runs.reduce((total, run) => total + run.cost, 0)).toBe(38);
 
     expect(
       scoreVerdict({
