@@ -28,7 +28,7 @@ Codex, GPT-5.6, OpenAI Responses API, official OpenAI JavaScript SDK, Next.js, T
 
 ### Repository URL
 
-`[ADD PUBLIC MIT-LICENSED REPOSITORY URL]`
+`https://github.com/Culaliya/one-more-control`
 
 If the repository remains private, share it with both `testing@devpost.com` and `build-week-event@openai.com` before submission.
 
@@ -38,7 +38,7 @@ If the repository remains private, share it with both `testing@devpost.com` and 
 
 ### Primary Codex `/feedback` Session ID
 
-`[RUN /feedback IN THE PRIMARY BUILD THREAD AND PASTE THE SESSION ID HERE]`
+`019f60a3-0378-7a33-b381-a05491e51f40`
 
 Use the thread where the majority of the core functionality was built, not a planning-only or side thread.
 
