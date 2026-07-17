@@ -46,9 +46,9 @@ Use the thread where the majority of the core functionality was built, not a pla
 
 ### Inspiration
 
-AI can produce a plausible explanation for almost any scientific result. But science does not advance by choosing the first explanation that sounds coherent. It advances by keeping multiple mechanisms alive long enough to design the experiment that makes the wrong ones impossible.
+In the AI era, preserving human judgment and learning how to troubleshoot feel like essential skills to me. AI can often provide a correct answer, but it may not explain why the other paths fail—or notice the human choices and possible sources of error that shape a process.
 
-Most educational tools reward recall or ask an AI tutor for the answer. We wanted to build the opposite: a game that preserves uncertainty, charges a cost for every experiment, and rewards falsification over confirmation.
+I wanted to make a game that trains logical elimination rather than answer collection. Players practice asking what evidence would rule an explanation out, looking at the same problem from another direction, and thinking about both the result and the path that produced it. Repeating that habit can gradually build stronger reasoning and judgment. This first case uses biochemistry, but I believe the same learning pattern applies across many fields.
 
 ### What it does
 
@@ -60,21 +60,23 @@ At the end, the player submits a mechanism, cites two results, falsifies an alte
 
 ### How we built it
 
-We built ONE MORE CONTROL as an English-first responsive Next.js application with TypeScript, Tailwind CSS, and the official OpenAI JavaScript SDK.
+I built ONE MORE CONTROL with Codex as an English-first responsive Next.js application using TypeScript, Tailwind CSS, and the official OpenAI JavaScript SDK.
 
 GPT-5.6 serves two bounded roles through the Responses API. First, it interprets a locally generated synthetic observation image. A strict structured-output schema limits that response to visible evidence, controls, missing controls, ambiguity, and confidence. Second, after deterministic scoring, it reviews only the server-validated reasoning trail and returns constrained feedback. The model cannot rank the starting hypotheses, reveal the mechanism early, give wet-lab instructions, invent an experiment or outcome, or alter the result trail. If either route is unavailable or fails semantic validation, an authored fallback keeps the game fully playable.
 
 The scientific truth lives in a separate server-only module. The experiment route validates the player's action, returns a pre-authored result, and recomputes the Bayesian posterior from run history rather than trusting the browser. Server code owns claim support, score, posterior, budget, cost, every experimental outcome, and the true mechanism. GPT-5.6 may review observed, server-validated outcomes after scoring, but it cannot create, change, or score a result. Small pure functions handle normalization, KL information gain, scoring, budget rules, and state transitions. Anonymous progress stays in local storage, so the demo needs no account or database.
 
-Codex helped us turn the product blueprint into an implementation plan, establish the AI/truth boundary, build the interface and state machine, implement the deterministic case engine, generate invariant-focused tests, and refine the end-to-end player experience. We kept the product, scientific, engineering, and visual decisions explicit throughout the primary build thread.
+Codex helped me turn the product blueprint into an implementation plan, establish the AI/truth boundary, build the interface and state machine, implement the deterministic case engine, generate invariant-focused tests, and refine the end-to-end player experience. I kept the product, scientific, engineering, and visual decisions explicit throughout the primary build thread.
 
 ### Challenges we ran into
 
-The hardest design problem was deciding what AI should not do. Allowing a model to invent experiments would make the experience flexible but scientifically untrustworthy. We separated interpretation and review from truth: GPT-5.6 can help a player inspect the opening observation and review a completed reasoning trail, while deterministic authored code controls every outcome, numeric update, score, and claim-support decision.
+The hardest part for me was deciding what this project should be. In my first discussion with GPT-5.6, it suggested a social-themed concept. It was creative and could help people organize decisions, but it felt more entertaining than constructive—and I already make games most of the time. For this competition, I wanted to build something different: meaningful depth, an idea beyond simply rebuilding a familiar tool, a connection to my own background, and a starting point grounded in a human need. Those constraints eventually led me to ONE MORE CONTROL.
 
-A second challenge was making Bayesian information gain understandable without turning the game into a statistics lecture. We connected the math to visible consequences: a limited budget, prediction splits, hypothesis survival states, and result roles that distinguish low-value repetition from a low-increment but independent confirmation.
+Once the direction was clear, the hardest design problem was deciding what AI should not do. Allowing a model to invent experiments would make the experience flexible but scientifically untrustworthy. The architecture separates interpretation and review from truth: GPT-5.6 can help a player inspect the opening observation and review a completed reasoning trail, while deterministic authored code controls every outcome, numeric update, score, and claim-support decision.
 
-We also needed to keep the hidden answer off the client while preserving a smooth anonymous game. Server-only truth, validated run history, and a separate verdict route let the debrief reveal the mechanism without shipping it in the browser bundle.
+A second challenge was making Bayesian information gain understandable without turning the game into a statistics lecture. I connected the math to visible consequences: a limited budget, prediction splits, hypothesis survival states, and result roles that distinguish low-value repetition from a low-increment but independent confirmation.
+
+I also needed to keep the hidden answer off the client while preserving a smooth anonymous game. Server-only truth, validated run history, and a separate verdict route let the debrief reveal the mechanism without shipping it in the browser bundle.
 
 ### Accomplishments that we're proud of
 
@@ -87,13 +89,15 @@ We also needed to keep the hidden answer off the client while preserving a smoot
 
 ### What we learned
 
-The most useful educational AI does not always collapse uncertainty. Sometimes its best role is to describe what is actually visible, preserve competing explanations, and leave causal judgment to evidence. We also learned that information gain becomes intuitive when every experiment has a cost and every prediction is made before the result appears.
+Personally, I learned to let go of control. I usually want to intervene in every detail, but this collaboration worked best when I set the direction, protected the things that mattered to me, and trusted Codex to carry the implementation forward. Sometimes that honestly meant stepping away from the keyboard for a while, watching the project take shape, and returning with clearer product decisions.
+
+From the game itself, I learned that this kind of reasoning practice is not limited by age or field. The most useful educational AI does not always collapse uncertainty; sometimes its best role is to preserve competing explanations and leave causal judgment to evidence. With more time, I would add much more art direction and visual polish so it feels even more like a beautiful, dramatic game. I love beautiful things, and I think beauty is part of what invites people to stay with a difficult idea long enough to understand it.
 
 ### What's next
 
 The next authored case is The Weak Mutant, which explores how to distinguish a catalytic defect from low protein abundance or incomplete cofactor loading. It is planned, not part of the current submission build.
 
-After that, we would add restricted natural-language mapping to pre-authored experiment cards, bounded Socratic questions, an instructor-reviewed case editor, more scientific domains, and accessibility options for an optional uncertainty soundscape. The deterministic engine would continue to own every result.
+After that, I would add restricted natural-language mapping to pre-authored experiment cards, bounded Socratic questions, an instructor-reviewed case editor, more scientific domains, and accessibility options for an optional uncertainty soundscape. The deterministic engine would continue to own every result.
 
 ### AI and Codex disclosure
 
